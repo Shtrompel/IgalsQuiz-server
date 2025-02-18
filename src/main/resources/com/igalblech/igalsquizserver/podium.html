@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podium</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 400px;
+            margin-top: 50px;
+        }
+
+        .podium {
+            position: relative;
+            width: 120px;
+            margin: 0 15px;
+            text-align: center;
+            transition: transform 0.5s ease-out;
+        }
+
+        .podium-bar {
+            width: 100%;
+            background: linear-gradient(to bottom, #4CAF50, #388E3C);
+            position: absolute;
+            bottom: 0;
+            transition: height 1s ease-out, transform 0.3s ease-in-out;
+            transform-origin: bottom;
+            animation: bounce 0.5s ease-in-out 1;
+        }
+
+        .podium-text {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Bouncing effect */
+        @keyframes bounce {
+            0% { transform: scaleY(0); }
+            50% { transform: scaleY(1.1); }
+            100% { transform: scaleY(1); }
+        }
+
+        .visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard">
+        <div class="podium" style="height: 200px;">
+            <div class="podium-bar" style="height: 0%;" data-height="200px"></div>
+            <div class="podium-text">Charles Michel (195)</div>
+        </div>
+        <div class="podium" style="height: 250px;">
+            <div class="podium-bar" style="height: 0%;" data-height="250px"></div>
+            <div class="podium-text">Bar de Wever (160)</div>
+        </div>
+        <div class="podium" style="height: 175px;">
+            <div class="podium-bar" style="height: 0%;" data-height="175px"></div>
+            <div class="podium-text">Jan Jambon (100)</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let bars = document.querySelectorAll(".podium-bar");
+            let texts = document.querySelectorAll(".podium-text");
+
+            bars.forEach((bar, index) => {
+                let height = bar.getAttribute("data-height");
+                setTimeout(() => {
+                    bar.style.height = height;
+                    texts[index].classList.add("visible");
+                }, height + 400);
+            });
+        });
+		
+function updatePodium(names, scores) {
+    let bars = document.querySelectorAll(".podium-bar");
+    let texts = document.querySelectorAll(".podium-text");
+
+    for (let i = 0; i < bars.length; i++) {
+        if (i < names.length) {
+            bars[i].setAttribute("data-height", scores[i] + "px");
+            texts[i].innerText = `${names[i]} (${scores[i]})`;
+        }
+    }
+
+    // Start animation
+    document.addEventListener("DOMContentLoaded", function () {
+        bars.forEach((bar, index) => {
+            let height = bar.getAttribute("data-height");
+            setTimeout(() => {
+                bar.style.height = height;
+                texts[index].classList.add("visible");
+            }, 500 + index * 300);
+        });
+    });
+}
+    </script>
+</body>
+</html>

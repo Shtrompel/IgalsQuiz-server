@@ -1,0 +1,48 @@
+{
+    "questions": [
+		{
+            "question_type": "QuestionMinigame",
+            "title": "Sus",
+            "description": "Can you complete this sus game?",
+			"points": 100,
+			"time_limit": 30000,
+			"game_name": "Wires",
+			"game_difficulty" : 1,
+			
+			"image": "igalnumber.png",
+        },
+        {
+            "question_type": "QuestionPainting",
+            "title": "Making Butterflies",
+            "description": "Draw a butterfly",
+			"points": 100,
+			"time_limit": 70000,
+			"painting_w": 300,
+			"painting_h": 300,
+			"painting_colors": ["rgb(255,0,0)", "rgb(0,255,0)", "rgb(0,0,255)"],
+			"painting_background": "rgb(50, 50, 50)",
+			
+			"image": "igalnumber.png",
+        },
+	    {
+            "question_type": "QuestionOrder",
+            "title": "Numbers",
+            "description": "Sort the numbers from smallest (bottom) to biggest (top)",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "order_answers": [
+                { "text": "1", "order": 1 },
+                { "text": "2", "order": 2 },
+                { "text": "3", "order": 3 },
+				{ "text": "4", "order": 4 },
+				{ "text": "5", "order": 5 },
+				{ "text": "6", "order": 6 },
+				{ "text": "7", "order": 7 },
+				{ "text": "8", "order": 8 },
+				{ "text": "9", "order": 9 },
+				{ "text": "10", "order": 10 }
+            ]
+        }
+    ]
+}

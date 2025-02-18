@@ -1,0 +1,46 @@
+
+participant Player Test #ffffff
+participant Player #ffffff
+materialdesignicons f48b App
+
+box over App: App Begins\nWaiting for clinets thread
+
+loop while not interrupted by server
+
+  Player-->App:Joining Socket (connect)
+  box over App: Adding player to socket\nMaking a new player handler thread
+  App-->Player:Server joined confirmation +\nSend id\n(confirm_connect)
+  
+  Player->App:Sending String Name \n(set_name)
+  box over App: Displaying the new player's name
+end
+box over App: Load Question
+
+
+
+group question
+App->Player:Send question data\n(send_question)
+box over App: Does intro animation and waits host's confirmation
+App->Player:Question Starts\n(question_start)
+
+alt If question is answered
+Player->App:Send answer\n(send_answer)
+box over App: Wait untill all active players answered
+else If the player did not responded
+box over App: Wait untill timer stops\nOR\nThe host pressed stop
+end
+
+
+App->Player: Time finished, force and answer it not found.\n(question_end)
+
+box over Player:Waiting for everyone to answer\n...
+
+App->Player:Send Answer Data\n(question_answer)
+
+
+box over Player:Show whether the question was correct,\npoints gain and the correct answer.
+
+
+end
+
+App->Player:Quiz End\n(quiz_end)

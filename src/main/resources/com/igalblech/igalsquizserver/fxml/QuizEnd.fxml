@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+
+<VBox fx:id="boxScreen" alignment="CENTER" prefHeight="800.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.igalblech.igalsquizserver.controllers.QuizEndController">
+   <children>
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Game End" textAlignment="CENTER">
+         <VBox.margin>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+         </VBox.margin>
+      </Text>
+      <WebView fx:id="webView" minHeight="-1.0" minWidth="-1.0" prefHeight="300.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+         </VBox.margin></WebView>
+      <Button fx:id="btnToMenu" mnemonicParsing="false" onMouseClicked="#btnToMenuPressed" text="To Menu">
+         <VBox.margin>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+         </VBox.margin>
+      </Button>
+   </children>
+</VBox>

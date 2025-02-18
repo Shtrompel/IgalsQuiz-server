@@ -1,0 +1,92 @@
+{
+	"questions":
+	[
+	{
+		"question_type": "QuestionChoice",
+		"title": "The Magic Number",
+		"description": "What is Igal's favorite number?",
+		"randomize": true,
+		"time_limit": 70000,
+		"points": 1000,
+		
+		"image": "igalnumber.png",
+		"sound": "igalsound.wav",
+		"read_question": true,
+		
+		"play_animation": true,
+		
+		"choice_answers": 
+		[
+			{
+				"text": "69",
+				"image": "choice_n_69.jpg",
+				"sound": "choice_n_69.wav",
+				"is_right": false
+			},
+			{
+				"text": "256",
+				"image": "choice_n_256.png",
+				"sound": "choice_n_256.wav",
+				"is_right": true
+			},
+			{
+				"text": "7",
+				"image": "choice_n_7.png",
+				"sound": "choice_n_7.wav",
+				"is_right": false
+			},
+			{
+				"text": "42",
+				"image": "choice_n_42.png",
+				"sound": "choice_n_42.wav",
+				"is_right": false
+			},
+						{
+				"text": "123",
+				"is_right": false,
+				"sound": "choice_n_123.wav"
+			},
+			{
+				"text": "0",
+				"is_right": true,
+				"sound": "choice_n_0.wav"
+			},
+			{
+				"text": "3.141",
+				"is_right": false,
+				"sound": "choice_n_3141.wav"			
+			},
+			{
+				"text": "420",
+				"is_right": false,
+				"sound": "choice_n_420.wav",
+			}
+		]
+	},
+	
+	{
+		"question_type": "QuestionChoice",
+		"text": "Test",
+		"randomize": true,
+		"choice_answers": 
+		[
+			{
+				"text": "Answer 1",
+				"is_right": false
+			},
+			{
+				"text": "Answer 2",
+				"is_right": false
+			},
+			{
+				"text": "Answer 3",
+				"is_right": true
+			},
+			{
+				"text": "Answer 4",
+				"is_right": false
+			}
+		]
+	}
+	]
+}

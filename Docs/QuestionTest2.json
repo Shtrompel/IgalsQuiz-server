@@ -1,0 +1,159 @@
+{
+    "questions": [
+	        {
+            "question_type": "QuestionChoice",
+            "title": "Physics",
+            "description": "What is the speed of light in vacuum?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "299,792,458 m/s", "is_right": true },
+                { "text": "3,000,000 m/s", "is_right": false },
+                { "text": "299,792,458 km/h", "is_right": false },
+                { "text": "300,000 m/s", "is_right": false },
+				{ "text": "1", "is_right": false },
+				{ "text": "2", "is_right": false },
+				{ "text": "3", "is_right": false },
+				{ "text": "4", "is_right": false },
+				{ "text": "5", "is_right": false },
+				{ "text": "6", "is_right": false },
+				{ "text": "7", "is_right": false },
+				{ "text": "8", "is_right": false },
+				{ "text": "9", "is_right": false },
+				{ "text": "10", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "The Magic Number",
+            "description": "What is Igal's favorite number?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "69", "is_right": false },
+                { "text": "256", "is_right": true },
+                { "text": "7", "is_right": false },
+                { "text": "42", "is_right": false },
+                { "text": "123", "is_right": false },
+                { "text": "0", "is_right": true },
+                { "text": "3.141", "is_right": false },
+                { "text": "420", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Prime Numbers",
+            "description": "Which of the following is a prime number?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "4", "is_right": false },
+                { "text": "5", "is_right": true },
+                { "text": "6", "is_right": false },
+                { "text": "8", "is_right": false },
+				{ "text": "49", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Basic Math",
+            "description": "What is 7 + 8?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "14", "is_right": false },
+                { "text": "15", "is_right": true },
+                { "text": "16", "is_right": false },
+                { "text": "17", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Science",
+            "description": "What is H2O commonly known as?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "Oxygen", "is_right": false },
+                { "text": "Hydrogen", "is_right": false },
+                { "text": "Water", "is_right": true },
+                { "text": "Salt", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Geography",
+            "description": "What is the capital of France?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "Berlin", "is_right": false },
+                { "text": "Madrid", "is_right": false },
+                { "text": "Paris", "is_right": true },
+                { "text": "Rome", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Literature",
+            "description": "Who wrote 'To Kill a Mockingbird'?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "F. Scott Fitzgerald", "is_right": false },
+                { "text": "Harper Lee", "is_right": true },
+                { "text": "J.D. Salinger", "is_right": false },
+                { "text": "Mark Twain", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "History",
+            "description": "In what year did World War II end?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "1940", "is_right": false },
+                { "text": "1942", "is_right": false },
+                { "text": "1945", "is_right": true },
+                { "text": "1950", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Biology",
+            "description": "What is the powerhouse of the cell?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "Nucleus", "is_right": false },
+                { "text": "Mitochondria", "is_right": true },
+                { "text": "Ribosome", "is_right": false },
+                { "text": "Golgi apparatus", "is_right": false }
+            ]
+        },
+        {
+            "question_type": "QuestionChoice",
+            "title": "Art",
+            "description": "Who painted the Mona Lisa?",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "Pablo Picasso", "is_right": false },
+                { "text": "Leonardo da Vinci", "is_right": true },
+                { "text": "Vincent van Gogh", "is_right": false },
+                { "text": "Claude Monet", "is_right": false }
+            ]
+        }
+    ]
+}
