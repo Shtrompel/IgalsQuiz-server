@@ -39,7 +39,7 @@
                <Image url="@../../../../../../../../Pictures/1354825400-0313223-www.nevsepic.com.ua.jpg" />
            </ImageView>
        </VBox>
-      <Text fx:id="textQuestionTime" strokeType="OUTSIDE" strokeWidth="0.0" text="Time Left" translateX="-200.0" translateY="-200.0">
+      <Text fx:id="textQuestionTime" strokeType="OUTSIDE" strokeWidth="0.0" text="Time Left" translateX="-300.0" translateY="-200.0">
          <StackPane.margin>
             <Insets />
          </StackPane.margin>

@@ -15,6 +15,8 @@ import java.util.TreeMap;
 public class QuestionOrder extends QuestionBase implements Cloneable {
     @Getter
     private Map<String, Choice> answers = new TreeMap<>();
+    @Getter
+    private List<Choice> answersOut  = null;
     private Map<Integer, Choice> answersIndx = new TreeMap<>();
 
     public QuestionOrder() {
@@ -45,14 +47,21 @@ public class QuestionOrder extends QuestionBase implements Cloneable {
             return;
         }
 
-        for (Object choice : object.getJSONArray("order_answers")) {
+        JSONArray jsonAnswers = object.getJSONArray("order_answers");
+        this.answersOut = new ArrayList<>();
+        for (Object choice : jsonAnswers) {
             JSONObject jsonChoice = (JSONObject) choice;
             Choice choiceObj = new Choice();
             choiceObj.loadJson(jsonChoice);
             if (choiceObj.getOrder() != -1) {
-                answers.put(choiceObj.getText(), choiceObj);
-                answersIndx.put(choiceObj.getOrder(), choiceObj);
+                this.answers.put(choiceObj.getText(), choiceObj);
+                this.answersIndx.put(choiceObj.getOrder(), choiceObj);
+                this.answersOut.add(choiceObj);
             }
+        }
+
+        if (this.randomize) {
+            java.util.Collections.shuffle(this.answersOut);
         }
     }
 
@@ -64,11 +73,16 @@ public class QuestionOrder extends QuestionBase implements Cloneable {
     @Override
     public void toJsonQuestionOnlySub(@NonNull JSONObject object) {
         JSONArray array = new JSONArray();
-        for (Choice choice : answers.values())
+        for (Choice choice : this.answersOut)
         {
             array.put(choice.toJson());
         }
         object.put("choices", array);
+    }
+
+    @Override
+    public Answer getDefaultAnswer() {
+        return new Answer();
     }
 
     @Override

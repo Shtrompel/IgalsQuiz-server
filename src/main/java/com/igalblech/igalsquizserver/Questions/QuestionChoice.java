@@ -73,6 +73,11 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
     }
 
     @Override
+    public Answer getDefaultAnswer() {
+        return new Answer();
+    }
+
+    @Override
     public Answer compareAnswer(@Nullable JSONObject jsonObject) {
 
         if (jsonObject == null)
@@ -114,11 +119,6 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
 
     private @NotNull Answer getAnswer(double timePassed, int correctMade) {
         double timeFactor = 1.0;
-
-        System.out.println(timePassed + ", " + this.timeLimit);
-        System.out.println(timePassed / (double)this.timeLimit);
-        System.out.println(timePassed / (double)this.timeLimit / 2.0);
-        System.out.println(1.0 - (timePassed / (double)this.timeLimit / 2.0));
 
         if (timePassed != -1.0)
             timeFactor = 1.0 - (timePassed / (double)this.timeLimit / 2.0);

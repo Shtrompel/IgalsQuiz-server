@@ -1,6 +1,14 @@
 
 .vbox {
-	-fx-background-color:  green;
+	-fx-background-color:  #f3f0e2;
+}
+
+.button {
+    -fx-background-color: #fada47; /* Normal color */
+}
+
+.button:pressed {
+    -fx-background-color: #e0b848; /* Color when pressed */
 }
 
 .label

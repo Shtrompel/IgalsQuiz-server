@@ -1,1 +1,1 @@
-{"timeLimit":70000,"description":"Draw a butterfly","paintingBackground":"rgb(50, 50, 50)","paintingW":300,"paintingColors":["rgb(255,0,0)","rgb(0,255,0)","rgb(0,0,255)"],"title":"Making Butterflies","questionType":"QuestionPainting","randomize":false,"paintingH":300,"points":100}
+{"timeLimit":120000,"gameDifficulty":0,"gameName":"Horror","description":"תנווטו את המבוך, אל תתנו לו לתסוף אתכם","title":"Can you escape him?","questionType":"QuestionMinigame","randomize":false,"reversePointing":true,"points":100}

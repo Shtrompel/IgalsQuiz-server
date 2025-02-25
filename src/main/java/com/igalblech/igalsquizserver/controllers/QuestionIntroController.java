@@ -2,19 +2,29 @@ package com.igalblech.igalsquizserver.controllers;
 
 import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
+import com.igalblech.igalsquizserver.Questions.QuestionMinigame;
 import com.igalblech.igalsquizserver.QuizApplication;
 import com.igalblech.igalsquizserver.SharedSessionData;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+import java.net.URL;
+
 public class QuestionIntroController implements InterfaceController {
 
-    public static final int TIME_START = 3;
+    public static final int TIME_START = 8;
     boolean skipIntro = false;
 
     SceneManager manager;
@@ -24,11 +34,25 @@ public class QuestionIntroController implements InterfaceController {
     Text labelCountdown;
     @FXML
     Text labelCoverQuestion;
+    @FXML
+    Text labelDescription;
+    @FXML
+    ImageView imageQuestion;
+    @FXML
+    StackPane stackPaneIntro;
 
     ParallelTransition countdownStart = null;
     int timeStart;
 
+    AudioClip audioScaryHit;
+
     private QuestionBase questionBase;
+
+    public void initialize()
+    {
+        URL url = QuizApplication.class.getResource("");
+        audioScaryHit = new AudioClip("file://" + url.getPath() + "audio/scaryhit.wav");
+    }
 
     private void sendQuestionData() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
@@ -81,6 +105,11 @@ public class QuestionIntroController implements InterfaceController {
         }
 
         this.labelCoverQuestion.setText(this.questionBase.getTitle());
+        this.labelDescription.setText(this.questionBase.getDescription());
+
+        this.imageQuestion.setFitWidth(this.questionBase.getImage().getWidth());
+        this.imageQuestion.setFitHeight(this.questionBase.getImage().getHeight());
+        this.imageQuestion.setImage(this.questionBase.getImage());
 
         labelCountdown.setVisible(true);
         labelCoverQuestion.setVisible(true);
@@ -94,6 +123,21 @@ public class QuestionIntroController implements InterfaceController {
     }
 
     private ParallelTransition getStartingTimeline() {
+
+        var countdown = getTimerTimeline();
+        var questionSequence = getTitleTimeline();
+        var description = getDescriptionTimeline();
+        var image = getImageTimeline();
+
+        ParallelTransition transition = new ParallelTransition(
+                countdown, questionSequence, image, description);
+        transition.setOnFinished(event -> transition.jumpTo(Duration.ZERO));
+
+        return transition;
+    }
+
+    private Animation getTimerTimeline()
+    {
         Timeline countdown = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
                     timeStart -= 1;
@@ -103,6 +147,83 @@ public class QuestionIntroController implements InterfaceController {
         );
         countdown.setCycleCount(timeStart);
         countdown.setOnFinished(event -> postIntroInit());
+
+        return countdown;
+    }
+
+    private Animation getDescriptionTimeline()
+    {
+        double timePause = TIME_START / 5.0 * 2.0;
+        double timeScale = TIME_START / 5.0;
+
+        PauseTransition questionPause = new PauseTransition(Duration.seconds(timePause));
+        double originalScaleX = labelDescription.getScaleX();
+        double originalScaleY = labelDescription.getScaleY();
+
+        labelDescription.setScaleX(0.0);
+        labelDescription.setScaleY(0.0);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(timeScale), labelDescription);
+        scale.setByX(1.0);
+        scale.setByY(1.0);
+
+        SequentialTransition sequence = new SequentialTransition(
+                questionPause,
+                scale);
+        sequence.setOnFinished(event -> {
+            labelDescription.setScaleX(originalScaleX);
+            labelDescription.setScaleY(originalScaleY);
+        });
+
+        return sequence;
+    }
+
+    private Animation getImageTimeline()
+    {
+        double timePause = TIME_START / 5.0 * 2.0;
+        double timeScale = TIME_START / 5.0;
+
+        PauseTransition questionPause = new PauseTransition(Duration.seconds(timePause));
+
+        questionPause.setOnFinished(event -> {
+            if (this.questionBase.getQuestionType().equals("QuestionMinigame") &&
+                    ((QuestionMinigame)this.questionBase).getGameName().equals("Horror"))
+            {
+                audioScaryHit.play();
+                stackPaneIntro.setStyle("-fx-background-color: #6d0000;");
+            }
+        });
+
+        double originalScaleX = imageQuestion.getScaleX();
+        double originalScaleY = imageQuestion.getScaleY();
+
+        imageQuestion.setScaleX(0.0);
+        imageQuestion.setScaleY(0.0);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(timeScale), imageQuestion);
+        scale.setByX(1.0);
+        scale.setByY(1.0);
+
+        SequentialTransition sequence = new SequentialTransition(
+                questionPause,
+                scale);
+        sequence.setOnFinished(event -> {
+            imageQuestion.setScaleX(originalScaleX);
+            imageQuestion.setScaleY(originalScaleY);
+        });
+
+        return sequence;
+    }
+
+    private Animation getTitleTimeline()
+    {
+        double timeScale = TIME_START / 5.0;
+        double timePause1 = TIME_START / 5.0 * 0.5;
+        double timeUp = TIME_START / 5.0 * 0.5;
+        double timePause2 = TIME_START / 5.0 * 2.0;
+        double timeFly2 = TIME_START / 5.0;
+
+        double timeFly = 0.5;
 
         labelCoverQuestion.setScaleX(0.0);
         labelCoverQuestion.setScaleY(0.0);
@@ -132,21 +253,31 @@ public class QuestionIntroController implements InterfaceController {
         double originalScaleY = labelCoverQuestion.getScaleY();
         double originalRotation = labelCoverQuestion.getRotate();
 
-        ScaleTransition questionScale = new ScaleTransition(Duration.seconds(TIME_START/5.0*3), labelCoverQuestion);
+        ScaleTransition questionScale = new ScaleTransition(Duration.seconds(timeScale), labelCoverQuestion);
         questionScale.setByX(1.0);
         questionScale.setByY(1.0);
         questionScale.setInterpolator(bounceInterpolator);
 
-        PauseTransition questionPause = new PauseTransition(Duration.seconds(TIME_START/5.0*1.5));
+        PauseTransition questionPauseA = new PauseTransition(Duration.seconds(timePause1));
 
-        TranslateTransition questionFlyP = new TranslateTransition(Duration.seconds(0.5), labelCoverQuestion);
+        TranslateTransition moveUp = new TranslateTransition(Duration.seconds(timeUp), labelCoverQuestion);
+        moveUp.setToY(-300);
+
+        PauseTransition questionPauseB = new PauseTransition(Duration.seconds(timePause2));
+
+        TranslateTransition questionFlyP = new TranslateTransition(Duration.seconds(timeFly), labelCoverQuestion);
         questionFlyP.setByX(Math.signum(Math.random() - 0.5) * (Math.random() * 1000 + 100));
         questionFlyP.setByY(Math.random() * 1000);
-        RotateTransition questionFlyR = new RotateTransition(Duration.seconds(TIME_START/5.0*0.5), labelCoverQuestion);
+        RotateTransition questionFlyR = new RotateTransition(Duration.seconds(timeFly2), labelCoverQuestion);
         questionFlyR.setByAngle(2 * (Math.random() - 0.5) * 360 * 5);
         ParallelTransition questionFly = new ParallelTransition(questionFlyP, questionFlyR);
 
-        SequentialTransition questionSequence = new SequentialTransition(questionScale, questionPause, questionFly);
+        SequentialTransition questionSequence = new SequentialTransition(
+                questionScale,
+                questionPauseA,
+                moveUp,
+                questionPauseB,
+                questionFly);
         questionSequence.setOnFinished(event -> {
             labelCoverQuestion.setTranslateX(originalX);
             labelCoverQuestion.setTranslateY(originalY);
@@ -155,13 +286,8 @@ public class QuestionIntroController implements InterfaceController {
             labelCoverQuestion.setRotate(originalRotation);
         });
 
-
-        ParallelTransition transition = new ParallelTransition(countdown, questionSequence);
-        transition.setOnFinished(event -> transition.jumpTo(Duration.ZERO));
-
-        return transition;
+        return questionSequence;
     }
-
 
 
     @Override
@@ -176,7 +302,7 @@ public class QuestionIntroController implements InterfaceController {
 
     @Override
     public void onClose() {
-
+        stackPaneIntro.setStyle("");
     }
 
     @Override

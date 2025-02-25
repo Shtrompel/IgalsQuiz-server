@@ -75,7 +75,7 @@ public class QuestionPaintingController implements InterfaceController, Interfac
 
 
     public void initialize() {
-        System.out.println("QuestionController initialize()");
+        System.out.println("QuestionPaintingController initialize()");
 
         this.btnsRate = new Button[]{btnRate1, btnRate2, btnRate3, btnRate4, btnRate5};
 
@@ -119,7 +119,7 @@ public class QuestionPaintingController implements InterfaceController, Interfac
             answer.setValidable(false);
         }
 
-        data.getServerSocket().sendQuestionEnd(data.getCurrent());
+        data.sendQuestionEnd();
 
         manager.changeScene("QUESTION_TRANSITION");
     }

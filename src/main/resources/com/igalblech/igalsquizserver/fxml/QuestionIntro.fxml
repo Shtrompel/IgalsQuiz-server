@@ -32,23 +32,35 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="stackPaneQuestion" prefHeight="800.0" prefWidth="1200.0" styleClass="vbox" stylesheets="@questionIntro.css"
-           xmlns="http://javafx.com/javafx/11.0.14-internal"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.igalblech.igalsquizserver.controllers.QuestionIntroController">
+<StackPane fx:id="stackPaneIntro" prefHeight="800.0" prefWidth="1200.0" styleClass="vbox" stylesheets="@questionIntro.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.igalblech.igalsquizserver.controllers.QuestionIntroController">
    <children>
-      <Text fx:id="labelCountdown" strokeType="OUTSIDE" strokeWidth="0.0" text="Time">
+      <Text fx:id="labelCountdown" strokeType="OUTSIDE" strokeWidth="0.0" text="Time" translateX="-400.0" translateY="-200.0">
          <font>
             <Font size="31.0" />
          </font>
       </Text>
-      <Text fx:id="labelCoverQuestion" layoutX="581.0" layoutY="423.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 50;" text="Question" translateY="60.0">
-         <font>
-            <Font size="31.0" />
-         </font>
-      </Text>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <Text fx:id="labelCoverQuestion" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-size: 50;" text="Question">
+               <font>
+                  <Font size="31.0" />
+               </font>
+            </Text>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <Text fx:id="labelDescription" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Text>
+            <ImageView fx:id="imageQuestion" fitHeight="150.0" fitWidth="200.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </VBox>
    </children>
 </StackPane>

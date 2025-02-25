@@ -40,8 +40,8 @@ public class ListPlayersController {
         int r = gridPanePlayers.getRowCount();
         int s = gridPanePlayers.getRowCount() * gridPanePlayers.getColumnCount();
 
-        System.out.println("Col:" + c + " Row:" + r + " Size: " + s + " Players:" + players.size());
-        System.out.println(players.size() / c + " " + r);
+        //System.out.println("Col:" + c + " Row:" + r + " Size: " + s + " Players:" + players.size());
+        //System.out.println(players.size() / c + " " + r);
 
         if (players.size() / c > r)
         {

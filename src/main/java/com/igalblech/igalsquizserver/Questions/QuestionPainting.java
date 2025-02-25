@@ -57,6 +57,11 @@ public class QuestionPainting extends QuestionBase implements Cloneable {
     }
 
     @Override
+    public Answer getDefaultAnswer() {
+        return new Answer();
+    }
+
+    @Override
     public Answer compareAnswer(@Nullable JSONObject jsonObject) {
         Answer out = new Answer();
         out.setExternalData(jsonObject);

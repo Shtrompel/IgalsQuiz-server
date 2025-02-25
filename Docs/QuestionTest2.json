@@ -11,17 +11,7 @@
                 { "text": "299,792,458 m/s", "is_right": true },
                 { "text": "3,000,000 m/s", "is_right": false },
                 { "text": "299,792,458 km/h", "is_right": false },
-                { "text": "300,000 m/s", "is_right": false },
-				{ "text": "1", "is_right": false },
-				{ "text": "2", "is_right": false },
-				{ "text": "3", "is_right": false },
-				{ "text": "4", "is_right": false },
-				{ "text": "5", "is_right": false },
-				{ "text": "6", "is_right": false },
-				{ "text": "7", "is_right": false },
-				{ "text": "8", "is_right": false },
-				{ "text": "9", "is_right": false },
-				{ "text": "10", "is_right": false }
+                { "text": "300,000 m/s", "is_right": false }
             ]
         },
         {

@@ -2,29 +2,15 @@
     "questions": [
 		{
             "question_type": "QuestionMinigame",
-            "title": "Sus",
-            "description": "Can you complete this sus game?",
+            "title": "Can you escape him?",
+            "description": "תנווטו את המבוך, אל תתנו לו לתסוף אתכם",
 			"points": 100,
-			"time_limit": 30000,
-			"game_name": "Wires",
-			"game_difficulty" : 1,
-			
-			"image": "igalnumber.png",
+			"time_limit": 120000,
+			"image": "imgs/horrorimage.png",
+			"game_name": "Horror",
+			"reverse_pointing": true
         },
-        {
-            "question_type": "QuestionPainting",
-            "title": "Making Butterflies",
-            "description": "Draw a butterfly",
-			"points": 100,
-			"time_limit": 70000,
-			"painting_w": 300,
-			"painting_h": 300,
-			"painting_colors": ["rgb(255,0,0)", "rgb(0,255,0)", "rgb(0,0,255)"],
-			"painting_background": "rgb(50, 50, 50)",
-			
-			"image": "igalnumber.png",
-        },
-	    {
+		{
             "question_type": "QuestionOrder",
             "title": "Numbers",
             "description": "Sort the numbers from smallest (bottom) to biggest (top)",
@@ -43,6 +29,30 @@
 				{ "text": "9", "order": 9 },
 				{ "text": "10", "order": 10 }
             ]
+        },
+		{
+            "question_type": "QuestionMinigame",
+            "title": "Sus",
+            "description": "Can you complete this sus game?",
+			"points": 100,
+			"time_limit": 30000,
+			"game_name": "Wires",
+			"game_difficulty" : 1,
+			"reverse_pointing": false,
+			"image": "igalnumber.png"
+        },
+        {
+            "question_type": "QuestionPainting",
+            "title": "Making Butterflies",
+            "description": "Draw a butterfly",
+			"points": 100,
+			"time_limit": 70000,
+			"painting_w": 300,
+			"painting_h": 300,
+			"painting_colors": ["rgb(255,0,0)", "rgb(0,255,0)", "rgb(0,0,255)"],
+			"painting_background": "rgb(50, 50, 50)",
+			
+			"image": "igalnumber.png",
         }
     ]
 }

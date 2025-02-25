@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
@@ -22,7 +24,11 @@ public class QuizApplication extends Application {
 
     SceneManager manager;
     Stage stage;
-    public static final String IP_ADDRESS = "192.168.68.55";
+    public static final String IP_ADDRESS;
+
+    static {
+        IP_ADDRESS = "192.168.68.59";
+    }
 
     public static final  int IP_PORT = 5205;
     public static final  int IP_WEB_PORT = 4200;

@@ -57,7 +57,7 @@ public class SharedSessionData implements UserData {
                 boolean allAnswered = true;
                 for (var ph : serverSocket.getPlayerHandlers().values()) {
                     //System.out.println(ph.getName() + ", " + ph.getAnswer());
-                    if (ph.getAnswer() == null) {
+                    if (ph.getAnswer() == null && ph.isActive()) {
                         allAnswered = false;
                         break;
                     }
@@ -150,5 +150,9 @@ public class SharedSessionData implements UserData {
     public void setQuestionsList(List<QuestionBase> questionsList) {
         this.questionsList = questionsList;
         this.itrQuestions = questionsList.listIterator();
+    }
+
+    public void sendQuestionEnd() {
+        serverSocket.sendQuestionEnd(this.getCurrent());
     }
 }

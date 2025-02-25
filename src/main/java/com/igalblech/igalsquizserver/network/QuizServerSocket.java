@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.igalblech.igalsquizserver.OnGetAnswer;
 import com.igalblech.igalsquizserver.Questions.Answer;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
-import com.igalblech.igalsquizserver.SocketMessage;
 import com.igalblech.igalsquizserver.controllers.OnPlayerName;
 import javafx.application.Platform;
 import lombok.Getter;
@@ -139,6 +138,12 @@ public class QuizServerSocket {
                 PlayerHandler player = new PlayerHandler(client, id);
                 playerHandlers.put(id, player);
             }
+            else
+            {
+                PlayerHandler player = playerHandlers.get(socketMessage.getId());
+                player.setActive(true);
+                player.setWebSocket(client);
+            }
 
             SocketMessage msgOut;
             msgOut = new SocketMessage(id, "confirm_connect", "server", "");
@@ -175,9 +180,11 @@ public class QuizServerSocket {
             }
             case "disconnect":
             {
-                playerHandlers.remove(socketMessage.getId());
-                if (onPlayerName != null)
-                    Platform.runLater(() -> onPlayerName.nameRemoved(player));
+                //playerHandlers.remove(socketMessage.getId());
+                //if (onPlayerName != null)
+                //    Platform.runLater(() -> onPlayerName.nameRemoved(player));
+                PlayerHandler playerHandler = playerHandlers.get(socketMessage.getId());
+                playerHandlers.get(socketMessage.getId()).setActive(false);
                 break;
             }
             case "connect":
@@ -238,7 +245,6 @@ public class QuizServerSocket {
                 handler.setAnswer(null);
             }
         }
-
     }
 
     public void sendQuestionEnd(QuestionBase current) {
@@ -250,13 +256,9 @@ public class QuizServerSocket {
             if (!handler.hasAnswer())
                 handler.setAnswer(current.compareAnswer(null));
             Answer rightAnswer = handler.getAnswer();
-
-            System.out.println("Answer 1: " + rightAnswer.toJson().toString());
-
             if (rightAnswer != null)
                 handler.addPoints(rightAnswer.getPoints());
         }
-
 
         SocketMessage socketMessage = new SocketMessage();
         socketMessage.setType("question_end");
@@ -268,8 +270,9 @@ public class QuizServerSocket {
         for (PlayerHandler handler : list) {
             JSONObject node;
             Answer trueAnswer = handler.getAnswer();
-            if (trueAnswer == null)
-                node = new Answer().toJson();
+            if (trueAnswer == null) {
+                node = current.getDefaultAnswer().toJson();
+            }
             else
                 node = trueAnswer.toJson();
             node.put("totalPoints", handler.getPoints());
@@ -285,6 +288,9 @@ public class QuizServerSocket {
     {
         for (PlayerHandler handler : playerHandlers.values())
         {
+            System.out.println("QuizServerSocket.sendMessageToAll: " + handler.toString());
+            System.out.println("QuizServerSocket.sendMessageToAll: " + message.toString());
+
             sendMessageToClient(handler, message);
         }
     }
@@ -333,76 +339,5 @@ public class QuizServerSocket {
     public void sendAward(PlayerHandler handler, String random) {
 
     }
-
-/*
-    void receiveJson(SocketIOClient conn, JsonNode jsonMsg)
-    {
-
-        if (!jsonMsg.has("id"))
-        {
-            System.out.println("Json Message has no \"id\" string! Aborting!");
-            return;
-        }
-
-        if (!jsonMsg.has("type"))
-        {
-            System.out.println("Json Message has no \"type\" string! Aborting!");
-            return;
-        }
-
-        String id = jsonMsg.getString("id");
-
-        if (jsonMsg.getString("type").equals("connect"))
-        {
-            System.out.println("In ID: " + id);
-            if (id.isEmpty())
-            {
-                id = UUID.randomUUID().toString();
-            }
-
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("id", id);
-            jsonOut.put("type", "confirm_connect");
-
-            conn.sendEvent("message", jsonOut.toString());
-            System.out.println("Out ID: " + id);
-        }
-
-        PlayerHandler player;
-        if (playerHandlers.containsKey(id))
-        {
-            player = playerHandlers.get(id);
-        }
-        else
-        {
-            player = new PlayerHandler(conn, id);
-            playerHandlers.put(id, player);
-        }
-
-        String messageType = jsonMsg.getString("type");
-        System.out.println("Message Type: " + messageType);
-        switch (messageType)
-        {
-            case "set_name":
-            {
-                String name = jsonMsg.getString("name");
-                player.setName(name);
-                System.out.println("Name Set To: " + name + " , " + (onPlayerName == null ? "null" : "not null"));
-                {
-                    if (onPlayerName != null)
-                        Platform.runLater(() -> onPlayerName.nameEntered(name, player));
-
-                }
-                break;
-            }
-            case "":
-            {
-
-            }
-            default:
-                System.out.println("Message \"" + messageType + "\" was not found.");
-        }
-    }
- */
 
 }

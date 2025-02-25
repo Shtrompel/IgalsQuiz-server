@@ -12,5 +12,7 @@ public interface QuestionAbstract {
 
     void toJsonQuestionOnlySub(@NonNull JSONObject out);
 
+    Answer getDefaultAnswer();
+
     Answer compareAnswer(@Nullable JSONObject jsonObject);
 }

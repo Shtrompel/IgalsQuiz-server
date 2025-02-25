@@ -27,6 +27,11 @@ public class Answer {
     String rightAnswer = "";
     boolean validable = true;
 
+    public Answer()
+    {
+
+    }
+
     // While when the player answers a question the data of the answer do not get saved,
     // in the painting minigame the picture has to be saved for the host to evaluate them.
     JSONObject externalData = null;

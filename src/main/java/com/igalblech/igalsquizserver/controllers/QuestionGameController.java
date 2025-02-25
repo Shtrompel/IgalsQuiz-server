@@ -42,7 +42,7 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
     public void initialize()
     {
-        System.out.println("QuestionController initialize()");
+        System.out.println("QuestionGameController initialize()");
     }
 
     public void onButtonFinishQuestionPressed()
@@ -66,8 +66,6 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
         // On Scene Opened Stuff
         System.out.println("QuestionController postIntroInit()");
-
-
 
         // Begin the countdown
         questionTimeStart = System.currentTimeMillis();
@@ -129,7 +127,7 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
     @Override
     public void onSendQuestionEnd() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
-        data.getServerSocket().sendQuestionEnd(data.getCurrent());
+        data.sendQuestionEnd();
 
         manager.changeScene("QUESTION_TRANSITION");
     }
@@ -157,6 +155,8 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
             return;
         }
 
+        imageQuestionImage.setFitWidth(questionsBase.getImage().getWidth());
+        imageQuestionImage.setFitHeight(questionsBase.getImage().getHeight());
         imageQuestionImage.setImage(questionsBase.getImage());
         textQuestionTitle.setText(questionsBase.getTitle());
         textQuestionDescription.setText(questionsBase.getDescription());
@@ -165,6 +165,5 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
         this.gameDifficulty = question.getGameDifficulty();
         this.gameName = question.getGameName();
-
     }
 }

@@ -107,7 +107,6 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
     public void onButtonFinishQuestionPressed()
     {
-
         onSendQuestionEnd();
     }
 
@@ -123,9 +122,8 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
 
         if ((questionsBase instanceof QuestionOrder question)) {
-            List<Choice> choiceList = new ArrayList<>(question.getAnswers().values());
-            if (question.isRandomize())
-                Collections.shuffle(choiceList);
+            List<Choice> choiceList = question.getAnswersOut();
+            System.out.println("QuestionOrder: " + question.isRandomize());
 
             double chroma = 0.3;
             for (int i = 0; i < choiceList.size(); i++) {
@@ -146,8 +144,8 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
             }
 
             fillChoicesGrid(choiceList);
-
         }
+
         if ((questionsBase instanceof QuestionChoice question)) {
 
             List<Choice> choiceList = new ArrayList<>(question.getChoices());
@@ -362,7 +360,7 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
     @Override
     public void onSendQuestionEnd() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
-        data.getServerSocket().sendQuestionEnd(data.getCurrent());
+        data.sendQuestionEnd();
 
         manager.changeScene("QUESTION_TRANSITION");
     }
