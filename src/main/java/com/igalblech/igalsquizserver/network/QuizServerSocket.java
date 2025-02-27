@@ -301,7 +301,8 @@ public class QuizServerSocket {
         message.setSource("server");
         message.setName(playerHandler.getUuid());
         message.setId(playerHandler.getUuid());
-        client.sendEvent("message", objectMapper.valueToTree(message).toString());
+        if (client != null)
+            client.sendEvent("message", objectMapper.valueToTree(message).toString());
     }
 
     static List<PlayerHandler> getSortedPlayerHandlers(Map<String, PlayerHandler> playerHandlers)

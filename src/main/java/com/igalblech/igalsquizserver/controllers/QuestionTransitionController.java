@@ -26,7 +26,6 @@ public class QuestionTransitionController  implements InterfaceController {
     Pane paneWithGraph;
     @FXML
     VBox vbox;
-    private Application app;
     @FXML
     Text textCountdownTimer;
 
@@ -80,11 +79,7 @@ public class QuestionTransitionController  implements InterfaceController {
         paneWithGraph.getChildren().add(barChart);
 
         paneWithGraph.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
-            double width = newValue.getWidth();
-            double height = newValue.getHeight();
-
             double h = paneWithGraph.getHeight() * 8 / 10;
-
             barChart.setMaxHeight(h);
             barChart.setPrefHeight(h);
             barChart.setMinHeight(h);
@@ -102,7 +97,6 @@ public class QuestionTransitionController  implements InterfaceController {
 
     @Override
     public void setApp(Application app) {
-        this.app = app;
     }
 
     @Override
@@ -121,70 +115,64 @@ public class QuestionTransitionController  implements InterfaceController {
         countdown.play();
         textCountdownTimer.setText(String.valueOf(timeStart));
 
-
-        Collection<PlayerHandler> players;
-        players = ((SharedSessionData) stageManager.getUserData()).getServerSocket().getPlayerHandlers().values();
-        /*
-        players = new ArrayList<>();
-        players.clear();
-        for (int i = 0 ; i < 12; i++)
-        {
-            PlayerHandler h = new PlayerHandler(null, null);
-            h.addPoints((int) (Math.random()*1000));
-            h.setName("user"+i);
-            players.add(h);
-        }*/
-
-        List<PlayerHandler> sortedPlayers = new ArrayList<>(players);
-        Collections.sort(sortedPlayers, (o1, o2) -> {
-            if (o1.getPoints() == o2.getPoints())
-                return 0;
-            return (o1.getPoints() > o2.getPoints()) ? -1 : (1);
-        });
-
-
-        XYChart.Series dataSeries1 = new XYChart.Series();
-
-        for (int j = 0; j < 10; j++) {
-            dataSeries1.getData().add(new XYChart.Data("", 0));
-        }
-
-        int i = 0;
-        for (PlayerHandler handler : sortedPlayers) {
-            int index = 10 - ++i;
-            if (index < 0)
-                continue;
-            int v = handler.getPoints();
-            String s = handler.getName();
-            dataSeries1.getData().set(index, new XYChart.Data(s, v)); // Ensure the index is valid
-        }
+        this.testPlayers();
 
         Platform.runLater(() -> {
+            Collection<PlayerHandler> players;
+            players = ((SharedSessionData) stageManager.getUserData()).getServerSocket().getPlayerHandlers().values();
+            PlayerHandler[] sortedPlayers = players.toArray(new PlayerHandler[0]);
+            Arrays.sort(sortedPlayers, (o1, o2) -> Integer.compare(o2.getPoints(), o1.getPoints()));
+            System.out.println(Arrays.toString(sortedPlayers));
+
+
+            XYChart.Series<String, Number> dataSeries1 = new XYChart.Series<>();
+            for (int i = 0; i < 10; i++) {
+                int v;
+                StringBuilder s;
+                if (i < sortedPlayers.length) {
+                    PlayerHandler handler;
+                    handler = sortedPlayers[i];
+                    v = handler.getPoints();
+                    s = new StringBuilder(handler.getName());
+                }
+                else
+                {
+                    v = 0;
+                    s = new StringBuilder();
+                    for (int j = 0; j < i; j++)
+                        s.append("⠀");
+                }
+                dataSeries1.getData().add(new XYChart.Data<>(s.toString(), v));
+            }
+
+            for (XYChart.Data<String, Number> data : dataSeries1.getData()) {
+                System.out.println(data.getXValue() + ": " + data.getYValue());
+            }
+
+            barChart.setAnimated(true);
             barChart.getData().clear();
+
             barChart.getData().add(dataSeries1);
         });
+    }
 
-        /*
-
-        ((SharedSessionData)stageManager.getUserData()).getServerSocket().getPlayerHandlers();
-
-        XYChart.Series dataSeries1 = new XYChart.Series();
-
-        barChart.getData().clear();
-        barChart.getData().add(dataSeries1);
-
-        int v = 0;
-        for (int i = 0; i < 10; i++) {
-            dataSeries1.getData().add(i, new XYChart.Data("", 0));
+    private void testPlayers() {
+        for (int i = 0; i < 3; i++)
+        {
+            PlayerHandler p = new PlayerHandler();
+            p.setName("name" + (int)(Math.random()*100));
+            p.setUuid(p.getName());
+            p.addPoints((int) (Math.random() * 200));
+            ((SharedSessionData) stageManager.getUserData()).getServerSocket().getPlayerHandlers().put(
+                    p.getUuid(), p
+            );
         }
-        for (int i = 0; i < 10; i++) {
-            v += (int) (Math.random() * 100);
-            String s = "user" + i + 1;
-            dataSeries1.getData().set(10 - i - 1, new XYChart.Data(s, v));
+        Collection<PlayerHandler> players;
+        players = ((SharedSessionData) stageManager.getUserData()).getServerSocket().getPlayerHandlers().values();
+        for (PlayerHandler p : players)
+        {
+            p.addPoints((int) (Math.random() * 400));
         }
-         */
-
-
     }
 
     @Override

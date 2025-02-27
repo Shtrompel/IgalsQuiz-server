@@ -5,14 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="vbox"
-      alignment="TOP_CENTER"
-      maxHeight="1.7976931348623157E308"
-      prefHeight="800.0"
-      VBox.vgrow="ALWAYS"
-      xmlns="http://javafx.com/javafx/11.0.14-internal"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.igalblech.igalsquizserver.controllers.QuestionTransitionController">
+<VBox fx:id="vbox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="800.0" style="-fx-background-color: #f3f0e2;" stylesheets="@question.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.igalblech.igalsquizserver.controllers.QuestionTransitionController">
 
    <children>
       <HBox alignment="CENTER">
@@ -25,7 +18,7 @@
                   <Font size="18.0" />
                </font>
             </Text>
-            <Button fx:id="buttonNextQuestion" mnemonicParsing="false" onAction="#onButtonNextQuestionPressed" text="Next">
+            <Button mnemonicParsing="false" onAction="#onButtonNextQuestionPressed" text="Next">
                <HBox.margin>
                   <Insets left="100.0" />
                </HBox.margin>
@@ -34,10 +27,16 @@
                </font>
             </Button>
          </children>
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </VBox.margin>
       </HBox>
       <HBox alignment="CENTER">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scoreboard" textAlignment="CENTER" wrappingWidth="633.13671875" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scoreboard" textAlignment="CENTER" wrappingWidth="633.13671875">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </HBox.margin></Text>
          </children>
       </HBox>
       <VBox fx:id="paneWithGraph" alignment="BOTTOM_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />

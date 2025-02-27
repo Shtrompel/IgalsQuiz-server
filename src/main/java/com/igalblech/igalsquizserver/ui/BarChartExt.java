@@ -32,7 +32,6 @@ public class BarChartExt<X, Y> extends BarChart<X, Y> {
      */
     @Override
     protected void seriesAdded(Series<X, Y> series, int seriesIndex) {
-
         super.seriesAdded(series, seriesIndex);
 
         for (int j = 0; j < series.getData().size(); j++) {
@@ -47,12 +46,13 @@ public class BarChartExt<X, Y> extends BarChart<X, Y> {
 
             Text text = new Text(String.valueOf(item.getYValue()));
             text.setTextAlignment(TextAlignment.CENTER);
+            text.setScaleX(0.5);
+            text.setScaleY(0.5);
 
             nodeMap.put(item.getNode(), text);
             getPlotChildren().add(text);
 
         }
-
     }
 
     /**
@@ -60,16 +60,11 @@ public class BarChartExt<X, Y> extends BarChart<X, Y> {
      */
     @Override
     protected void seriesRemoved(final Series<X, Y> series) {
-
         for (Node bar : nodeMap.keySet()) {
-
             Node text = nodeMap.get(bar);
             getPlotChildren().remove(text);
-
         }
-
         nodeMap.clear();
-
         super.seriesRemoved(series);
     }
 
@@ -86,5 +81,10 @@ public class BarChartExt<X, Y> extends BarChart<X, Y> {
             text.relocate(bar.getBoundsInParent().getCenterX(), bar.getBoundsInParent().getMinY() - 30);
         }
 
+    }
+
+    public void clear() {
+        this.getPlotChildren().clear();
+        this.nodeMap.clear();
     }
 }

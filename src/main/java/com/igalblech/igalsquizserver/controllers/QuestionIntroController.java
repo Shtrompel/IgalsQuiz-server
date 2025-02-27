@@ -7,16 +7,11 @@ import com.igalblech.igalsquizserver.QuizApplication;
 import com.igalblech.igalsquizserver.SharedSessionData;
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -24,7 +19,7 @@ import java.net.URL;
 
 public class QuestionIntroController implements InterfaceController {
 
-    public static final int TIME_START = 8;
+    public static final int TIME_START = 1;
     boolean skipIntro = false;
 
     SceneManager manager;
@@ -51,6 +46,7 @@ public class QuestionIntroController implements InterfaceController {
     public void initialize()
     {
         URL url = QuizApplication.class.getResource("");
+        assert url != null;
         audioScaryHit = new AudioClip("file://" + url.getPath() + "audio/scaryhit.wav");
     }
 
@@ -78,7 +74,7 @@ public class QuestionIntroController implements InterfaceController {
         String sceneName = QuizApplication.questionTypeToSceneName(
                 this.questionBase.getQuestionType());
 
-        if (sceneName.equals(""))
+        if (sceneName.isEmpty())
             throw new IllegalArgumentException(String.format("Can't find scene for question type %s", sceneName));
 
         manager.changeScene(sceneName);
@@ -107,8 +103,10 @@ public class QuestionIntroController implements InterfaceController {
         this.labelCoverQuestion.setText(this.questionBase.getTitle());
         this.labelDescription.setText(this.questionBase.getDescription());
 
-        this.imageQuestion.setFitWidth(this.questionBase.getImage().getWidth());
-        this.imageQuestion.setFitHeight(this.questionBase.getImage().getHeight());
+        if (this.questionBase.getImage() != null) {
+            this.imageQuestion.setFitWidth(this.questionBase.getImage().getWidth());
+            this.imageQuestion.setFitHeight(this.questionBase.getImage().getHeight());
+        }
         this.imageQuestion.setImage(this.questionBase.getImage());
 
         labelCountdown.setVisible(true);
