@@ -1,4 +1,4 @@
-package com.igalblech.igalsquizserver;
+package com.igalblech.igalsquizserver.network;
 
 public interface OnGetAnswer {
 

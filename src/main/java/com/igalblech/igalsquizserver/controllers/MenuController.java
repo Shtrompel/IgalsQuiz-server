@@ -24,6 +24,7 @@ import java.net.Inet4Address;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -42,11 +43,11 @@ public class MenuController implements InterfaceController, OnPlayerName {
 
     SceneManager stageManager;
     QuizApplication application;
+    private boolean forceLoad = false;
 
     public void initialize() throws UnknownHostException {
         System.out.println("MenuController initialize()");
         System.out.println(Inet4Address.getLocalHost().getHostAddress());
-        textMenuIp.setText("IP is " + QuizApplication.IP_ADDRESS + ":" + QuizApplication.IP_WEB_PORT);
     }
 
     @FXML
@@ -64,7 +65,7 @@ public class MenuController implements InterfaceController, OnPlayerName {
         String lastPathStr = properties.getProperty("lastDirectory");
 
         if (lastPathStr != null) {
-            String lastDirPath = URLDecoder.decode(lastPathStr);
+            String lastDirPath = URLDecoder.decode(lastPathStr, StandardCharsets.UTF_8);
             File lastDirectory = new File(lastDirPath);
             if (lastDirectory.exists()) {
                 fileChooser.setInitialDirectory(lastDirectory);
@@ -76,9 +77,10 @@ public class MenuController implements InterfaceController, OnPlayerName {
         fileChooser.getExtensionFilters().add(extensionFilter);
 
         File file = null;
-        if (properties.getProperty("forceLoad", "false").equals("true")) {
+        forceLoad = properties.getProperty("forceLoad", "false").equals("true");
+        if (forceLoad) {
             file = new File(java.net.URLDecoder.decode(
-                    properties.getProperty("lastFile")));
+                    properties.getProperty("lastFile"), StandardCharsets.UTF_8));
         }
         if (file == null) {
             file = fileChooser.showOpenDialog(stageManager.getMainScene().getWindow());
@@ -88,11 +90,19 @@ public class MenuController implements InterfaceController, OnPlayerName {
             try {
                 properties.setProperty(
                         "lastDirectory",
-                        URLEncoder.encode(file.getParentFile().getAbsolutePath())
+                        URLEncoder.encode(file.getParentFile().getAbsolutePath(), StandardCharsets.UTF_8)
                 );
                 properties.setProperty(
                         "lastFile",
-                        URLEncoder.encode(file.getAbsolutePath())
+                        URLEncoder.encode(file.getAbsolutePath(), StandardCharsets.UTF_8)
+                );
+                properties.setProperty(
+                        "forceLoad",
+                        this.forceLoad ? "true" : "false"
+                );
+                properties.setProperty(
+                        "ip",
+                        questionsSet.getIpAddress()
                 );
 
                 // Require the file questions
@@ -104,6 +114,10 @@ public class MenuController implements InterfaceController, OnPlayerName {
                 return;
             }
         }
+
+
+        //for (int i = 0; i < 12; i++) questionsSet.getNext();
+        //for (int i = 0; i < 23; i++) questionsSet.getNext();
 
         stageManager.changeScene("QUESTION_INTRO");
 
@@ -129,7 +143,6 @@ public class MenuController implements InterfaceController, OnPlayerName {
         String content;
         content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
         JSONObject jsonObject = new JSONObject(content);
-        SharedSessionData questionsSet = (SharedSessionData)stageManager.getUserData();
 
         //questionsSet.setQuestionsList(
         return SharedSessionData.getQuestionsListFromJson(jsonObject);
@@ -159,15 +172,10 @@ public class MenuController implements InterfaceController, OnPlayerName {
         // onPlayerName as defined in this class with run inside the QuizServerSocket class
         SharedSessionData data;
         data = (SharedSessionData)stageManager.getUserData();
-        data.getServerSocket().setOnPlayerName(this);
 
-        for (int i = 0; i < 0; i++)
-        {
-            PlayerHandler handler = new PlayerHandler();
-            handler.setName("name" + i);
-            handler.setUuid("uuid" + i);
-            data.getServerSocket().getPlayerHandlers().put(handler.getUuid(), handler);
-        }
+        textMenuIp.setText("IP is " + data.getIpAddress() + ":" + QuizApplication.IP_WEB_PORT);
+
+        data.getServerSocket().setOnPlayerName(this);
 
         clearGrid();
         for (PlayerHandler handler : data.getServerSocket().getPlayerHandlers().values())
@@ -220,12 +228,11 @@ public class MenuController implements InterfaceController, OnPlayerName {
         for (Node node : gridUsers.getChildren())
         {
             Object obj = node.getUserData();
-            if (obj == null || !(obj instanceof String))
+            if (!(obj instanceof String))
                 continue;
             String id = (String) node.getUserData();
-            if ((handler != null && id.equals(handler.getUuid())) && node instanceof Label)
+            if ((handler != null && id.equals(handler.getUuid())) && node instanceof Label label)
             {
-                Label label = (Label)node;
                 label.setText(name);
                 return;
             }
@@ -235,9 +242,7 @@ public class MenuController implements InterfaceController, OnPlayerName {
         if (handler != null)
             label.setUserData(handler.getUuid());
 
-        label.setOnMouseClicked(event -> {
-            contextMenu.show(label, event.getScreenX(), event.getScreenY());
-        });
+        label.setOnMouseClicked(event -> contextMenu.show(label, event.getScreenX(), event.getScreenY()));
 
         int c = gridUsers.getChildren().size() - 1;
         gridUsers.add(
@@ -250,7 +255,7 @@ public class MenuController implements InterfaceController, OnPlayerName {
     public void nameRemoved(PlayerHandler handler) {
         for (Node node : gridUsers.getChildren()) {
             Object obj = node.getUserData();
-            if (obj == null || !(obj instanceof String))
+            if (!(obj instanceof String))
                 continue;
 
             String id = (String) node.getUserData();

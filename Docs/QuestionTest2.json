@@ -1,6 +1,24 @@
 {
     "questions": [
-	        {
+	      {
+            "question_type": "QuestionChoice",
+            "title": "Test",
+            "description": "Select the right group ",
+            "randomize": true,
+			"points": 100,
+			"time_limit": 70000,
+            "choice_answers": [
+                { "text": "Answer A (Group 1)", "is_right": true, "group": 1 },
+                { "text": "Answer B (Group 2)", "is_right": true, "group": 2 },
+                { "text": "Answer C (Group 2)", "is_right": true, "group": 2 },
+                { "text": "Answer D", "is_right": false},
+                { "text": "Answer E", "is_right": false },
+                { "text": "Answer F", "is_right": false }
+            ],
+			"transition_time": 10
+        },
+		
+	      {
             "question_type": "QuestionChoice",
             "title": "Physics",
             "description": "What is the speed of light in vacuum?",

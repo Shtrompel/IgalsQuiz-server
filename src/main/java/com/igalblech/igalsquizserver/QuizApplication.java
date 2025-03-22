@@ -14,6 +14,8 @@ import lombok.Getter;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,10 +26,13 @@ public class QuizApplication extends Application {
 
     SceneManager manager;
     Stage stage;
-    public static final String IP_ADDRESS;
+    public static final String IP_ADDRESS_DEFAULT;
+    public String ipAddress = "";
 
     static {
-        IP_ADDRESS = "192.168.68.59";
+        //IP_ADDRESS = "192.168.68.63";
+        IP_ADDRESS_DEFAULT = "0.0.0.0";
+        //IP_ADDRESS = "ws://h8o0x2th80xm.share.zrok.io";
     }
 
     public static final  int IP_PORT = 5205;
@@ -38,6 +43,8 @@ public class QuizApplication extends Application {
     private static final String CONFIG_FILE = "config.properties";
     private Properties properties;
 
+    private static final String ASSETS_FOLDER = "assets";
+
     public static String questionTypeToSceneName(String questionType)
     {
         String sceneName = "";
@@ -45,6 +52,7 @@ public class QuizApplication extends Application {
         {
             case "QuestionChoice":
             case "QuestionOrder":
+            case "QuestionMatchPairs":
                 sceneName = "QUESTION";
                 break;
             case "QuestionPainting":
@@ -78,10 +86,11 @@ public class QuizApplication extends Application {
             }
         }));
 
-        // Initialize Sockets
+        this.ipAddress = properties.getProperty("ip", IP_ADDRESS_DEFAULT);
 
+        // Initialize Sockets
         try {
-            serverSocket = new QuizServerSocket(IP_ADDRESS, IP_PORT);
+            serverSocket = new QuizServerSocket(this.ipAddress, IP_PORT);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -99,7 +108,7 @@ public class QuizApplication extends Application {
         // Initialize Gui
 
         FXMLLoader loader = new FXMLLoader(
-                QuizApplication.class.getResource("fxml/MainLayout.fxml"));
+                QuizApplication.getFileURL("fxml/MainLayout.fxml"));
         Parent root = loader.load();
         Scene mainScene = new Scene(root);
 
@@ -112,6 +121,7 @@ public class QuizApplication extends Application {
         // Initialize Manager
 
         SharedSessionData userData = new SharedSessionData(serverSocket, properties);
+        userData.setIpAddress(this.ipAddress);
 
         manager = new SceneManager(this, mainScene, userData);
         manager.addStage("MENU", "Menu.fxml");
@@ -123,16 +133,18 @@ public class QuizApplication extends Application {
         manager.addStage("QUIZ_END", "QuizEnd.fxml");
 
 
+        ((SharedSessionData)this.manager.getUserData()).playMusicMenu();
+
         userData.setOnGetSceneManager(() -> manager);
         this.stage = stage;
         ((MainController)loader.getController()).setApp(manager.application);
         ((MainController)loader.getController()).setScene(manager);
 
         // Initialize Manager Finishing
-
         manager.changeScene("MENU");
 
         stage.setOnCloseRequest(t -> {
+            System.out.println("onCloseRequest");
             Platform.exit();
             System.exit(0);
         });
@@ -140,8 +152,47 @@ public class QuizApplication extends Application {
     }
 
     public static void main(String[] args) {
-        // setOnCrashHandler();
+        //setOnCrashHandler();
         launch();
+    }
+
+    public static File getFile(String path) {
+        // Try loading from the project directory
+        File file = new File(ASSETS_FOLDER, path);
+        if (file.exists()) {
+            return file;
+        }
+
+        // Try loading from classpath (resources folder)
+        URL resource = QuizApplication.class.getResource(path);
+        if (resource != null) {
+            return new File(resource.getFile());
+        }
+
+        // If neither works, return null
+        return null;
+    }
+
+    public static URL getFileURL(String path) {
+        try {
+            // Try loading from the project directory
+            File file = new File(ASSETS_FOLDER, path);
+            if (file.exists()) {
+                return file.toURI().toURL();
+            }
+
+            // Try loading from classpath (resources folder)
+            URL resource = QuizApplication.class.getResource(path);
+            if (resource != null) {
+                return resource;
+            }
+
+            // If neither works, return null
+            return null;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     static void setOnCrashHandler()
@@ -152,11 +203,21 @@ public class QuizApplication extends Application {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
-                String filename = "crashlogs/"+sdf.format(cal.getTime())+".txt";
+
+                File file = QuizApplication.getFile(sdf.format(cal.getTime())+".txt");
+                if (!file.exists()) {
+                    try {
+                        // Create the file if it doesn't exist
+                        file.createNewFile();
+                        System.out.println("File created: " + file.getAbsolutePath());
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
 
                 PrintStream writer;
                 try {
-                    writer = new PrintStream(filename, "UTF-8");
+                    writer = new PrintStream(file, "UTF-8");
                     writer.println(e.getClass() + ": " + e.getMessage());
                     for (int i = 0; i < e.getStackTrace().length; i++) {
                         writer.println(e.getStackTrace()[i].toString());

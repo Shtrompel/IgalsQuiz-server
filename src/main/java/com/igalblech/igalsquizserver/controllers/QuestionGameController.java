@@ -1,6 +1,5 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
 import com.igalblech.igalsquizserver.Questions.QuestionMinigame;
 import com.igalblech.igalsquizserver.SharedSessionData;
@@ -39,6 +38,7 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
     private String gameName;
     private int gameDifficulty;
+    private QuestionMinigame question;
 
     public void initialize()
     {
@@ -64,9 +64,6 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
         textQuestionTime.setVisible(false);
         buttonFinishQuestion.setVisible(false);
 
-        // On Scene Opened Stuff
-        System.out.println("QuestionController postIntroInit()");
-
         // Begin the countdown
         questionTimeStart = System.currentTimeMillis();
 
@@ -83,6 +80,15 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
             return;
         }
 
+        if (!gameName.equals("Horror"))
+        {
+            ((SharedSessionData)this.manager.getUserData()).playMusicQuestion();
+        }
+        else
+        {
+            ((SharedSessionData)this.manager.getUserData()).stopMusic();
+        }
+
         // If there is a time limit:
 
         timerQuestion = new AnimationTimer() {
@@ -93,7 +99,8 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
                 if (timePassed < 0) {
                     timerQuestion.stop();
-                    onSendQuestionEnd();
+                    if (question.isForceEnd())
+                        onSendQuestionEnd();
                 }
 
                 long seconds = timePassed / 1000;
@@ -155,9 +162,11 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
             return;
         }
 
-        imageQuestionImage.setFitWidth(questionsBase.getImage().getWidth());
-        imageQuestionImage.setFitHeight(questionsBase.getImage().getHeight());
-        imageQuestionImage.setImage(questionsBase.getImage());
+        if (questionsBase.getImage() != null) {
+            imageQuestionImage.setFitWidth(questionsBase.getImage().getWidth());
+            imageQuestionImage.setFitHeight(questionsBase.getImage().getHeight());
+            imageQuestionImage.setImage(questionsBase.getImage());
+        }
         textQuestionTitle.setText(questionsBase.getTitle());
         textQuestionDescription.setText(questionsBase.getDescription());
 
@@ -165,5 +174,7 @@ public class QuestionGameController implements InterfaceController, InterfaceQue
 
         this.gameDifficulty = question.getGameDifficulty();
         this.gameName = question.getGameName();
+
+        this.question = question;
     }
 }

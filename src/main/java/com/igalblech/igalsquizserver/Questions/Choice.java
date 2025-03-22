@@ -1,6 +1,5 @@
 package com.igalblech.igalsquizserver.Questions;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.igalblech.igalsquizserver.QuizApplication;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
@@ -8,11 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.igalblech.igalsquizserver.Utils;
+import com.igalblech.igalsquizserver.utils.Utils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 
 @Getter
 public class Choice {
@@ -20,6 +18,7 @@ public class Choice {
     String text = "";
     boolean isRight = false;
     int order = -1;
+    int group = -1;
     @Setter
     int[] color = new int[]{};
 
@@ -45,6 +44,8 @@ public class Choice {
             imageStr =  json.getString("image");
         if (json.has("sound"))
          soundStr = json.getString("sound");
+        if (json.has("group"))
+            this.group = json.getInt("group");
 
         if (json.has("color")) {
             JSONArray jsonColors = json.getJSONArray("json");
@@ -56,7 +57,7 @@ public class Choice {
         if (imageStr != null && !imageStr.equals(""))
         {
             try {
-                URL resource = QuizApplication.class.getResource(imageStr);
+                URL resource = QuizApplication.getFileURL(imageStr);
                 this.image = new Image(resource.openStream());
             } catch (IllegalArgumentException | IOException | NullPointerException e) {
                 System.out.println("Can't find " + imageStr);
@@ -64,7 +65,7 @@ public class Choice {
         }
 
         if (soundStr != null && !soundStr.equals("")) {
-            final URL resource = QuizApplication.class.getResource(soundStr);
+            final URL resource = QuizApplication.getFileURL(soundStr);
             if (resource != null)
                 this.sound = new javafx.scene.media.Media(resource.toString());
             else
@@ -79,6 +80,7 @@ public class Choice {
         out.put("isRight", isRight);
         out.put("order", order);
         out.put("color", color);
+        out.put("group", group);
         if (image != null) {
             out.put("image",  Utils.encodeImageToBase64(image));
         }

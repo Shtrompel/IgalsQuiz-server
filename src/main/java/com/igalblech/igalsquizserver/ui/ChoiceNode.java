@@ -29,18 +29,18 @@ public class ChoiceNode extends StackPane {
         Pane imagePane = new Pane();
         imagePane.setBackground(background);
 
-        backgroundImageView.setPreserveRatio(false);  // Allow the image to stretch
-        //backgroundImageView.fitWidthProperty().bind(imagePane.widthProperty());
-        backgroundImageView.setFitWidth(250);
-        backgroundImageView.fitHeightProperty().bind(imagePane.heightProperty());
-
-        imagePane.setMinHeight(100);
-        imagePane.setMaxHeight(100);
-
-        //backgroundImageView.setFitWidth(200);
-        //backgroundImageView.setFitHeight(100);
-
+        backgroundImageView.setPreserveRatio(false);
         backgroundImageView.setSmooth(true);
+        if (backgroundImage != null)
+        {
+            backgroundImageView.fitWidthProperty().bind(imagePane.widthProperty());
+            backgroundImageView.fitHeightProperty().bind(imagePane.heightProperty());
+        }
+        else
+        {
+        }
+        imagePane.setPrefWidth(600);
+        imagePane.setPrefHeight(300);
 
         imagePane.getChildren().add(backgroundImageView);
 

@@ -1,6 +1,5 @@
-package com.igalblech.igalsquizserver;
+package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.controllers.SceneManager;
 import javafx.application.Application;
 import javafx.scene.input.KeyEvent;
 

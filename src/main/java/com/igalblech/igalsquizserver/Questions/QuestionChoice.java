@@ -8,14 +8,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Console;
+import java.util.*;
 
 public class QuestionChoice extends QuestionBase implements Cloneable {
 
     @Getter
     private List<Choice> choices = new ArrayList<>();
+    private List<Choice> choicesOut = new ArrayList<>();
     private List<Choice> correctChoices = new ArrayList<>();
+    private Map<Integer, List<Choice>> groups = new HashMap<>();
 
     public QuestionChoice() {
         super();
@@ -37,7 +39,6 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
 
     @Override
     public void loadJsonSub(JSONObject object) throws JSONException {
-
         if (!object.has("choice_answers"))
         {
             return;
@@ -48,12 +49,27 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
             Choice choiceObj = new Choice();
             choiceObj.loadJson(jsonChoice);
             choices.add(choiceObj);
+            if (choiceObj.isRight())
+            {
+                if (!groups.containsKey(choiceObj.getGroup())) {
+                    List<Choice> list = new ArrayList<>();
+                    list.add(choiceObj);
+                    groups.put(choiceObj.getGroup(), list);
+                }
+                else
+                    groups.get(choiceObj.getGroup()).add(choiceObj);
+            }
          }
 
         for (Choice choice : choices)
         {
             if (choice.isRight())
                 correctChoices.add(choice);
+        }
+
+        this.choicesOut = new ArrayList<>(this.choices);
+        if (this.randomize) {
+            java.util.Collections.shuffle(this.choicesOut);
         }
     }
 
@@ -65,11 +81,25 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
     @Override
     public void toJsonQuestionOnlySub(@NonNull JSONObject object) {
         JSONArray array = new JSONArray();
-        for (Choice choice : choices)
+
+        for (Choice choice : choicesOut)
         {
             array.put(choice.toJson());
         }
+
+        int max = -1;
+        if (this.groups.isEmpty())
+        {
+            max = correctChoices.size();
+        }
+        else {
+            for (List<Choice> choice : this.groups.values()) {
+                max = Math.max(max, choice.size());
+            }
+        }
+
         object.put("choices", array);
+        object.put("maxChoices", max);
     }
 
     @Override
@@ -80,9 +110,8 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
     @Override
     public Answer compareAnswer(@Nullable JSONObject jsonObject) {
 
-        if (jsonObject == null)
-        {
-            return getAnswer(-1, 0);
+        if (jsonObject == null) {
+            return getAnswer(-1, 0, 0);
         }
 
         double timePassed = -1.0;
@@ -91,33 +120,58 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
         }
 
         int correctMade = 0;
+        int correctTotal = 0;
 
+        if (jsonObject.has("answers")) {
+            JSONArray jsonAnswers = jsonObject.getJSONArray("answers");
+            if (groups.isEmpty()) {
+                correctTotal = correctChoices.size();
 
-        for (Choice choice : choices) {
-            // If choice is not a right answer, no point in checking it
-            if (!choice.isRight())
-                continue;
+                for (Choice choice : choices) {
+                    // If choice is not a right answer, no point in checking it
+                    if (!choice.isRight())
+                        continue;
 
-            // Find if any of the answers match
-            if (jsonObject.has("answers")) {
-
-                JSONArray jsonAnswers = jsonObject.getJSONArray("answers");
-
-                for (int i = 0; i < jsonAnswers.length(); i++) {
-                    String answer = jsonAnswers.getString(i);
-                    if (answer.equals(choice.getText())) {
+                    // Find if any of the answers match
+                    for (int i = 0; i < jsonAnswers.length(); i++) {
+                        String answer = jsonAnswers.getString(i);
+                        if (!answer.equals(choice.getText()))
+                            break;
                         correctMade += 1;
-                        break;
                     }
                 }
+            } else {
+                // There are multiple groups that can be right, and the player can select answers from any group
+                // todo finish comment
+                int maxCorrect = -1;
+                int maxTotal = -1;
+                System.out.println(jsonAnswers);
+                for (List<Choice> choices : this.groups.values()) {
+                    int correctCurrent = 0;
+                    for (Choice choice : choices) {
+                        for (int i = 0; i < jsonAnswers.length(); i++) {
+                            String answer = jsonAnswers.getString(i);
+                            if (!answer.equals(choice.getText()))
+                                continue;
+                            correctCurrent += 1;
+                        }
+                    }
+
+                    if (maxCorrect == -1 || (double) correctCurrent / choices.size() > (double) maxCorrect / maxTotal) {
+                        maxCorrect = correctCurrent;
+                        maxTotal = choices.size();
+                    }
+
+                }
+                correctTotal = maxTotal;
+                correctMade = maxCorrect;
             }
         }
 
-        Answer answer = getAnswer(timePassed, correctMade);
-        return getAnswer(timePassed, correctMade);
+        return getAnswer(timePassed, correctMade, correctTotal);
     }
 
-    private @NotNull Answer getAnswer(double timePassed, int correctMade) {
+    private @NotNull Answer getAnswer(double timePassed, int correctMade, int correctTotal) {
         double timeFactor = 1.0;
 
         if (timePassed != -1.0)
@@ -130,7 +184,7 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
         {
             rightAnswer = "The right answer was " + correctChoices.getFirst().getText();
         }
-        else
+        else if (groups.isEmpty())
         {
             rightAnswer = "The answers were ";
             for (int i = 0; i < correctChoices.size(); i++)
@@ -140,10 +194,33 @@ public class QuestionChoice extends QuestionBase implements Cloneable {
                     rightAnswer += " and ";
             }
         }
+        else
+        {
+            List<Choice>[] choicesGroups = groups.values().stream()
+                    .toArray(List[]::new);
+            rightAnswer = "The answers were ";
+            for (int i = 0; i < choicesGroups.length; i++)
+            {
+                var choices = choicesGroups[i];
+                String groupStr = "";
+                for (int j = 0; j < choices.size(); j++)
+                {
+                    groupStr += choices.get(j).getText();
+                    if (j != choices.size() - 1)
+                        groupStr += " and ";
+                }
+                rightAnswer += groupStr;
+                if (i != choicesGroups.length - 1)
+                    rightAnswer += " or ";
+            }
+        }
 
         Answer answer = new Answer();
-        answer.setValidity(correctChoices.size(), correctMade);
-        answer.setPoints((int)(points * timeFactor * ((double) correctMade / (double)correctChoices.size())));
+        answer.setValidity(correctTotal, correctMade);
+        if (correctTotal != 0)
+            answer.setPoints((int)(points * timeFactor * ((double) correctMade / (double)correctTotal)));
+        else
+            answer.setPoints(0);
         answer.setRightAnswer(rightAnswer);
 
         return answer;

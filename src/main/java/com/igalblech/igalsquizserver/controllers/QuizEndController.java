@@ -1,17 +1,14 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.QuizApplication;
 import com.igalblech.igalsquizserver.SharedSessionData;
 import com.igalblech.igalsquizserver.network.PlayerHandler;
 import com.igalblech.igalsquizserver.network.QuizServerSocket;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.scene.input.KeyEvent;
 
@@ -66,7 +63,7 @@ public class QuizEndController implements InterfaceController {
             }
         });
 
-        URL url = QuizApplication.class.getResource("podium.html");
+        URL url = QuizApplication.getFileURL("podium.html");
         System.out.println(url.toExternalForm());
         if (url != null) {
             webEngine.load(url.toExternalForm());

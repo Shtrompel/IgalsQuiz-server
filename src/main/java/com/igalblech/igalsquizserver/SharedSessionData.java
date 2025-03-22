@@ -5,18 +5,32 @@ import com.igalblech.igalsquizserver.Questions.QuestionBase;
 import com.igalblech.igalsquizserver.controllers.SceneManager;
 import com.igalblech.igalsquizserver.network.PlayerHandler;
 import com.igalblech.igalsquizserver.network.QuizServerSocket;
+import com.igalblech.igalsquizserver.utils.UserData;
+import javafx.application.Platform;
+import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
 public class SharedSessionData implements UserData {
+
+    public static final double VOLUME = 1;
+
+    @Getter @Setter
+    private String ipAddress = "";
 
     @Getter
     private List<QuestionBase> questionsList;
@@ -33,10 +47,30 @@ public class SharedSessionData implements UserData {
     @Setter
     private OnGetSceneManager onGetSceneManager = null;
 
-    SharedSessionData(QuizServerSocket serverSocket, Properties properties)
-    {
+    private AudioClip musicMenu;
+    private AudioClip musicQuestion;
+    private MediaPlayer sfxEndQuestion;
+
+    SharedSessionData(QuizServerSocket serverSocket, Properties properties) {
         this.serverSocket = serverSocket;
         this.properties = properties;
+
+        try {
+            this.musicMenu = new AudioClip(QuizApplication.getFileURL("audio/lobbymusic.mp3").toURI().toString());
+            musicMenu.setCycleCount(16);
+            this.musicQuestion = new AudioClip(QuizApplication.getFileURL("audio/qestion.mp3").toURI().toString());
+            this.musicQuestion.setCycleCount(16);
+            {
+                Media media = new Media(QuizApplication.getFileURL("audio/answer.mp3").toURI().toString());
+                this.sfxEndQuestion = new MediaPlayer(media);
+                this.sfxEndQuestion.setCycleCount(2);
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        musicMenu.setVolume(VOLUME);
+        musicQuestion.setVolume(VOLUME);
 
         this.serverSocket.setOnGetAnswer((id, answerStr) -> {
 
@@ -48,9 +82,11 @@ public class SharedSessionData implements UserData {
             Answer answer = null;
             if (currentQuestion != null) {
                 answer = currentQuestion.compareAnswer(new JSONObject(answerStr));
-                // System.out.println(answer.toJson().toString());
             }
+
+            System.out.println("Got answer: " + answer.toString());
             handler.setAnswer(answer);
+            System.out.println("Got answer: " + handler.toString());
 
 
             if (onGetSceneManager != null) {
@@ -72,6 +108,34 @@ public class SharedSessionData implements UserData {
         });
     }
 
+    public void playMusicMenu()
+    {
+        stopMusic();
+        Platform.runLater(() -> {
+            musicMenu.play();
+        });
+    }
+
+    public void playMusicQuestion() {
+        stopMusic();
+        Platform.runLater(() -> {
+            musicQuestion.play();
+        });
+    }
+
+    public void playPostQuestion() {
+        stopMusic();
+        Platform.runLater(() -> sfxEndQuestion.play());
+    }
+
+    public void stopMusic()
+    {
+        this.musicMenu.stop();
+        this.musicQuestion.stop();
+        this.sfxEndQuestion.stop();
+    }
+
+
     public boolean hasNext()
     {
         if (itrQuestions == null)
@@ -81,7 +145,6 @@ public class SharedSessionData implements UserData {
 
     public QuestionBase getNext()
     {
-
         if (itrQuestions == null)
             return null;
         return (currentQuestion = itrQuestions.next());

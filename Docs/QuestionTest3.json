@@ -1,58 +1,177 @@
 {
     "questions": [
+	{
+            "question_type": "QuestionPainting",
+            "title": "Making Butterflies",
+            "description": "Draw a butterfly",
+            "points": 100,
+            "time_limit": 7000,
+            "painting_w": 300,
+            "painting_h": 300,
+            "painting_colors": [
+                "rgb(255,0,0)",
+                "rgb(0,255,0)",
+                "rgb(0,0,255)"
+            ],
+            "painting_background": "rgb(50, 50, 50)",
+            "image": "igalnumber.png"
+        },
+	 {
+            "question_type": "QuestionMatchPairs",
+            "title": "To Be Honest...",
+            "description": "תתאימו כל יצור למצב ניורו-התפתחותי שלו",
+            "points": 100,
+            "time_limit": 60000,
+            "pair_answers": [{
+                    "item": {
+                        "text": "Autism"
+                    },
+                    "target": {
+                        "image": "imgs/neuro_autism.png"
+                    }
+                }, {
+                    "item": {
+                        "text": "ADHD"
+                    },
+                    "target": {
+                        "image": "imgs/neuro_adhd.png"
+                    }
+                }, {
+                    "item": {
+                        "text": "Anexiety"
+                    },
+                    "target": {
+                        "image": "imgs/neuro_anexiety.png"
+                    }
+                }, {
+                    "item": {
+                        "text": "Depression"
+                    },
+                    "target": {
+                        "image": "imgs/neuro_depression.png"
+                    }
+                }
+            ]
+        }, 
 		{
+            "question_type": "QuestionMatchPairs",
+            "title": "Butter Fly",
+            "description": "תתאימו כל פרפר לשם המתאים שלו",
+            "points": 200,
+            "time_limit": 60000,
+            "pair_answers": [{
+                    "item": {
+                        "image": "imgs/Butterfly_Papilio_machaon.jpg"
+                    },
+                    "target": {
+                        "text": "זנב סנונית נאה"
+                    }
+                }, {
+                    "item": {
+                        "image": "imgs/Butterfly_Pieris_rapae.jpg"
+                    },
+                    "target": {
+                        "text": "לבנין הצנון"
+                    }
+                }, {
+                    "item": {
+                        "image": "imgs/Butterfly_Melanargia_titea_titania.jpg"
+                    },
+                    "target": {
+                        "text": "אביבית משויישת"
+                    }
+                }, {
+                    "item": {
+                        "image": "imgs/Butterfly_Polyommatus_icarus.jpg"
+                    },
+                    "target": {
+                        "text": "כחליל השברק"
+                    }
+                }, {
+                    "item": {
+                        "image": "imgs/Butterfly_Carcharodus_alceae.jpg"
+                    },
+                    "target": {
+                        "text": "אפורית החלמית"
+                    }
+                }
+            ]
+        }, {
             "question_type": "QuestionMinigame",
             "title": "Can you escape him?",
             "description": "תנווטו את המבוך, אל תתנו לו לתסוף אתכם",
-			"points": 100,
-			"time_limit": 120000,
-			"image": "imgs/horrorimage.png",
-			"game_name": "Horror",
-			"reverse_pointing": true
-        },
-		{
+            "points": 100,
+            "time_limit": 120000,
+            "image": "imgs/horrorimage.png",
+            "game_name": "Horror",
+            "reverse_pointing": true
+        }, {
+            "question_type": "QuestionMinigame",
+            "title": "Can you catch the balls",
+            "description": "",
+            "points": 100,
+            "time_limit": 60000,
+            "game_name": "Balls",
+            "force_end": false,
+            "reverse_pointing": true
+        }, {
+            "question_type": "QuestionMinigame",
+            "title": "Can you catch the balls",
+            "description": "",
+            "points": 100,
+            "time_limit": 60000,
+            "game_name": "Balls",
+            "force_end": false,
+            "reverse_pointing": true
+        }, {
             "question_type": "QuestionOrder",
             "title": "Numbers",
             "description": "Sort the numbers from smallest (bottom) to biggest (top)",
             "randomize": true,
-			"points": 100,
-			"time_limit": 70000,
-            "order_answers": [
-                { "text": "1", "order": 1 },
-                { "text": "2", "order": 2 },
-                { "text": "3", "order": 3 },
-				{ "text": "4", "order": 4 },
-				{ "text": "5", "order": 5 },
-				{ "text": "6", "order": 6 },
-				{ "text": "7", "order": 7 },
-				{ "text": "8", "order": 8 },
-				{ "text": "9", "order": 9 },
-				{ "text": "10", "order": 10 }
+            "points": 100,
+            "time_limit": 70000,
+            "order_answers": [{
+                    "text": "1",
+                    "order": 1
+                }, {
+                    "text": "2",
+                    "order": 2
+                }, {
+                    "text": "3",
+                    "order": 3
+                }, {
+                    "text": "4",
+                    "order": 4
+                }, {
+                    "text": "5",
+                    "order": 5
+                }, {
+                    "text": "6",
+                    "order": 6
+                }, {
+                    "text": "7",
+                    "order": 7
+                }, {
+                    "text": "8",
+                    "order": 8
+                }, {
+                    "text": "9",
+                    "order": 9
+                }, {
+                    "text": "10",
+                    "order": 10
+                }
             ]
-        },
-		{
+        }, {
             "question_type": "QuestionMinigame",
             "title": "Sus",
             "description": "Can you complete this sus game?",
-			"points": 100,
-			"time_limit": 30000,
-			"game_name": "Wires",
-			"game_difficulty" : 1,
-			"reverse_pointing": false,
-			"image": "igalnumber.png"
-        },
-        {
-            "question_type": "QuestionPainting",
-            "title": "Making Butterflies",
-            "description": "Draw a butterfly",
-			"points": 100,
-			"time_limit": 70000,
-			"painting_w": 300,
-			"painting_h": 300,
-			"painting_colors": ["rgb(255,0,0)", "rgb(0,255,0)", "rgb(0,0,255)"],
-			"painting_background": "rgb(50, 50, 50)",
-			
-			"image": "igalnumber.png",
+            "points": 100,
+            "time_limit": 30000,
+            "game_name": "Wires",
+            "game_difficulty": 8,
+            "reverse_pointing": false,
+            "image": "igalnumber.png"
         }
     ]
 }

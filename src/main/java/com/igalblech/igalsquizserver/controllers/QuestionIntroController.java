@@ -1,6 +1,5 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
 import com.igalblech.igalsquizserver.Questions.QuestionMinigame;
 import com.igalblech.igalsquizserver.QuizApplication;
@@ -19,7 +18,7 @@ import java.net.URL;
 
 public class QuestionIntroController implements InterfaceController {
 
-    public static final int TIME_START = 1;
+    public static final int TIME_START = 8;
     boolean skipIntro = false;
 
     SceneManager manager;
@@ -45,14 +44,14 @@ public class QuestionIntroController implements InterfaceController {
 
     public void initialize()
     {
-        URL url = QuizApplication.class.getResource("");
+        URL url = QuizApplication.getFileURL("");
         assert url != null;
         audioScaryHit = new AudioClip("file://" + url.getPath() + "audio/scaryhit.wav");
     }
 
     private void sendQuestionData() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
-        data.getServerSocket().sendQuestionData();
+        data.getServerSocket().sendQuestionData(this.timeStart);
     }
 
     void postIntroInit() {
@@ -92,6 +91,9 @@ public class QuestionIntroController implements InterfaceController {
 
         this.questionBase = questionsSet.getNext();
 
+        timeStart = TIME_START;
+        if (questionBase.getTransitionTime() != -1)
+            timeStart = questionBase.getTransitionTime();
         sendQuestionData();
 
         if (skipIntro)
@@ -104,15 +106,49 @@ public class QuestionIntroController implements InterfaceController {
         this.labelDescription.setText(this.questionBase.getDescription());
 
         if (this.questionBase.getImage() != null) {
-            this.imageQuestion.setFitWidth(this.questionBase.getImage().getWidth());
-            this.imageQuestion.setFitHeight(this.questionBase.getImage().getHeight());
+
+            var originalImage = this.questionBase.getImage();
+
+            double maxWidth =  400;
+            double maxHeight = 800;
+            double minWidth = 200;
+            double minHeight = 200;
+
+            double originalWidth = originalImage.getWidth();
+            double originalHeight = originalImage.getHeight();
+            double aspectRatio = originalWidth / originalHeight;
+
+            double newWidth = originalWidth;
+            double newHeight = originalHeight;
+
+            if (originalWidth > maxWidth || originalHeight > maxHeight) {
+                if (originalWidth / maxWidth > originalHeight / maxHeight) {
+                    newWidth = maxWidth;
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newHeight = maxHeight;
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+
+            if (originalWidth < minWidth || originalHeight < minHeight) {
+                if (originalWidth / minWidth < originalHeight / minHeight) {
+                    newWidth = minWidth;
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newHeight = minHeight;
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+
+            this.imageQuestion.setFitWidth(newWidth);
+            this.imageQuestion.setFitHeight(newHeight);
         }
         this.imageQuestion.setImage(this.questionBase.getImage());
 
         labelCountdown.setVisible(true);
         labelCoverQuestion.setVisible(true);
 
-        this.timeStart = TIME_START;
         labelCountdown.setText(String.valueOf(timeStart));
 
         countdownStart = getStartingTimeline();
@@ -151,8 +187,8 @@ public class QuestionIntroController implements InterfaceController {
 
     private Animation getDescriptionTimeline()
     {
-        double timePause = TIME_START / 5.0 * 2.0;
-        double timeScale = TIME_START / 5.0;
+        double timePause = timeStart / 5.0 * 2.0;
+        double timeScale = timeStart / 5.0;
 
         PauseTransition questionPause = new PauseTransition(Duration.seconds(timePause));
         double originalScaleX = labelDescription.getScaleX();
@@ -178,8 +214,8 @@ public class QuestionIntroController implements InterfaceController {
 
     private Animation getImageTimeline()
     {
-        double timePause = TIME_START / 5.0 * 2.0;
-        double timeScale = TIME_START / 5.0;
+        double timePause = timeStart / 5.0 * 2.0;
+        double timeScale = timeStart / 5.0;
 
         PauseTransition questionPause = new PauseTransition(Duration.seconds(timePause));
 
@@ -189,6 +225,7 @@ public class QuestionIntroController implements InterfaceController {
             {
                 audioScaryHit.play();
                 stackPaneIntro.setStyle("-fx-background-color: #6d0000;");
+                ((SharedSessionData)this.manager.getUserData()).stopMusic();
             }
         });
 
@@ -215,11 +252,11 @@ public class QuestionIntroController implements InterfaceController {
 
     private Animation getTitleTimeline()
     {
-        double timeScale = TIME_START / 5.0;
-        double timePause1 = TIME_START / 5.0 * 0.5;
-        double timeUp = TIME_START / 5.0 * 0.5;
-        double timePause2 = TIME_START / 5.0 * 2.0;
-        double timeFly2 = TIME_START / 5.0;
+        double timeScale = timeStart / 5.0;
+        double timePause1 = timeStart / 5.0 * 0.5;
+        double timeUp = timeStart / 5.0 * 0.5;
+        double timePause2 = timeStart / 5.0 * 2.0;
+        double timeFly2 = timeStart / 5.0;
 
         double timeFly = 0.5;
 

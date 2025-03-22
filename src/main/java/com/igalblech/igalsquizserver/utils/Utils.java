@@ -1,4 +1,4 @@
-package com.igalblech.igalsquizserver;
+package com.igalblech.igalsquizserver.utils;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

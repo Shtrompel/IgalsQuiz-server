@@ -5,12 +5,12 @@ import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
+@Getter
 public class QuestionMinigame extends QuestionBase implements Cloneable {
-    @Getter
-    private int gameDifficulty = 0;
 
-    @Getter
+    private int gameDifficulty = 0;
     private String gameName = "";
+    protected boolean forceEnd = true;
 
     // Usually the longer a question takes to answer the more points will be reduced from the reward
     // If reversePointing is set to true, the opposite is true.
@@ -28,6 +28,8 @@ public class QuestionMinigame extends QuestionBase implements Cloneable {
             this.gameName = object.getString("game_name");
         if (object.has("reverse_pointing"))
             this.reversePointing = object.getBoolean("reverse_pointing");
+        if (object.has("force_end"))
+            this.forceEnd = object.getBoolean("force_end");
     }
 
     @Override
@@ -41,6 +43,7 @@ public class QuestionMinigame extends QuestionBase implements Cloneable {
         out.put("gameDifficulty", gameDifficulty);
         out.put("gameName", gameName);
         out.put("reversePointing", reversePointing);
+        out.put("forceEnd", forceEnd);
     }
 
     @Override

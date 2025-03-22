@@ -1,8 +1,7 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.QuizApplication;
-import com.igalblech.igalsquizserver.UserData;
+import com.igalblech.igalsquizserver.utils.UserData;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -54,7 +52,6 @@ public class SceneManager {
     }
 
     public void changeScene(String title) throws IllegalArgumentException{
-
         Platform.runLater(() -> {
             changeSceneThisThread(title);
         });
@@ -91,7 +88,7 @@ public class SceneManager {
 
     public void addStage(String title, String path) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(
-                QuizApplication.class.getResource("fxml/" + path));
+                QuizApplication.getFileURL("fxml/" + path));
 
         Parent parent = fxmlLoader.load();
         SceneData stageData = new SceneData();

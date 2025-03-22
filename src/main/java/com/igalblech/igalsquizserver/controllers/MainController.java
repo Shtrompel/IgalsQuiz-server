@@ -1,10 +1,10 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.QuizApplication;
 import com.igalblech.igalsquizserver.SharedSessionData;
 import com.igalblech.igalsquizserver.network.QuizServerSocket;
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.beans.value.ChangeListener;
 
 public class MainController  implements InterfaceController {
 
@@ -33,7 +34,7 @@ public class MainController  implements InterfaceController {
     {
         QuizServerSocket serverSocket;
         serverSocket = ((SharedSessionData)stageManager.getUserData()).getServerSocket();
-        serverSocket.sendEndGame(true);
+        serverSocket.sendEndGame(false);
         serverSocket.resetGame();
 
         System.exit(0);
@@ -43,7 +44,7 @@ public class MainController  implements InterfaceController {
     {
         QuizServerSocket serverSocket;
         serverSocket = ((SharedSessionData)stageManager.getUserData()).getServerSocket();
-        serverSocket.sendEndGame(false);
+        serverSocket.sendEndGame(true);
         serverSocket.resetGame();
 
         this.stageManager.changeScene("MENU");
@@ -60,6 +61,10 @@ public class MainController  implements InterfaceController {
         this.stageManager = stageManager;
     }
 
+    public void initialize()
+    {
+    }
+
     @Override
     public void setApp(Application app) {
         System.out.println("setApp");
@@ -69,7 +74,6 @@ public class MainController  implements InterfaceController {
 
     @Override
     public void onShown() {
-
     }
 
     @Override
@@ -94,7 +98,7 @@ public class MainController  implements InterfaceController {
 
         // Load FXML if you have a separate layout
         FXMLLoader loader = new FXMLLoader(
-                QuizApplication.class.getResource("fxml/ListPlayers.fxml")
+                QuizApplication.getFileURL("fxml/ListPlayers.fxml")
         );
 
 
@@ -104,6 +108,13 @@ public class MainController  implements InterfaceController {
         extraStage.setScene(extraScene);
         extraStage.initModality(Modality.WINDOW_MODAL); // Blocks input to other windows until closed
         extraStage.show();
+
+        extraStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                // Close the window when it loses focus
+                extraStage.close();
+            }
+        });
 
         ((ListPlayersController)loader.getController()).init(stageManager);
     }

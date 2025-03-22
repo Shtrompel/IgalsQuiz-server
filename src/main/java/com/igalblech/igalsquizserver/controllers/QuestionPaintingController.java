@@ -1,35 +1,28 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
 import com.igalblech.igalsquizserver.Questions.Answer;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
-import com.igalblech.igalsquizserver.Questions.QuestionMinigame;
 import com.igalblech.igalsquizserver.Questions.QuestionPainting;
 import com.igalblech.igalsquizserver.QuizApplication;
 import com.igalblech.igalsquizserver.SharedSessionData;
-import com.igalblech.igalsquizserver.Utils;
+import com.igalblech.igalsquizserver.utils.Utils;
 import com.igalblech.igalsquizserver.network.PlayerHandler;
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -80,7 +73,7 @@ public class QuestionPaintingController implements InterfaceController, Interfac
         this.btnsRate = new Button[]{btnRate1, btnRate2, btnRate3, btnRate4, btnRate5};
 
         for (int i = 0; i < 5; i++) {
-            URL url = QuizApplication.class.getResource("");
+            URL url = QuizApplication.getFileURL("");
             assert url != null;
             String path = "file://" + url.getPath() + "imgs/scale" + (i + 1) + ".png";
             Image img = new Image(path);
@@ -103,24 +96,26 @@ public class QuestionPaintingController implements InterfaceController, Interfac
 
         var data = ((SharedSessionData) manager.getUserData());
 
-        for (int i = 0; i < players.length; i++) {
-            PlayerHandler playerHandler = players[i];
-            int r = rating[i];
+        if (rating != null && rating.length > 0) {
 
-            Answer.Validity validity = Answer.Validity.PARTIALLY_RIGHT;
-            if (r == 0)
-                validity = Answer.Validity.WRONG;
-            else if (r == 4)
-                validity = Answer.Validity.RIGHT;
+            for (int i = 0; i < players.length; i++) {
+                PlayerHandler playerHandler = players[i];
+                int r = rating[i];
 
-            Answer answer = playerHandler.getAnswer();
-            answer.setPoints((int) (data.getCurrent().getPoints() * ((double) r / 4)));
-            answer.setValidity(validity);
-            answer.setValidable(false);
+                Answer.Validity validity = Answer.Validity.PARTIALLY_RIGHT;
+                if (r == 0)
+                    validity = Answer.Validity.WRONG;
+                else if (r == 4)
+                    validity = Answer.Validity.RIGHT;
+
+                Answer answer = playerHandler.getAnswer();
+                answer.setPoints((int) (data.getCurrent().getPoints() * ((double) r / 4)));
+                answer.setValidity(validity);
+                answer.setValidable(false);
+            }
         }
 
         data.sendQuestionEnd();
-
         manager.changeScene("QUESTION_TRANSITION");
     }
 
@@ -151,6 +146,8 @@ public class QuestionPaintingController implements InterfaceController, Interfac
         textQuestionTime.setVisible(true);
         boxPaintingRating.setVisible(false);
         imageQuestionImage.setVisible(true);
+
+        ((SharedSessionData)this.manager.getUserData()).playMusicQuestion();
 
         // Begin the countdown
         questionTimeStart = System.currentTimeMillis();
@@ -208,7 +205,7 @@ public class QuestionPaintingController implements InterfaceController, Interfac
 
                 if (timePassed < 0) {
                     timerQuestion.stop();
-                    onSendQuestionEnd();
+                    //onSendQuestionEnd();
                 }
 
                 long seconds = timePassed / 1000;
@@ -278,6 +275,9 @@ public class QuestionPaintingController implements InterfaceController, Interfac
     }
 
     private void buttonVotePressed(int v) {
+        if (this.rating == null)
+            return;
+
         for (int i = 0; i < btnsRate.length; i++)
             buttonVoteColorUnpress(i);
         buttonVoteColorPress(v);

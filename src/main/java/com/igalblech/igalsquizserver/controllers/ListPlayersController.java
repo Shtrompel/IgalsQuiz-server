@@ -16,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Window;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class ListPlayersController {
 
@@ -35,13 +36,10 @@ public class ListPlayersController {
         this.manager = manager;
         this.sessionData = (SharedSessionData) manager.getUserData();
 
-        var players = sessionData.getServerSocket().getPlayerHandlers().values();
+        var players = new ArrayList<>(sessionData.getServerSocket().getPlayerHandlers().values());
         int c = gridPanePlayers.getColumnCount();
         int r = gridPanePlayers.getRowCount();
         int s = gridPanePlayers.getRowCount() * gridPanePlayers.getColumnCount();
-
-        //System.out.println("Col:" + c + " Row:" + r + " Size: " + s + " Players:" + players.size());
-        //System.out.println(players.size() / c + " " + r);
 
         if (players.size() / c > r)
         {
@@ -58,8 +56,9 @@ public class ListPlayersController {
                 gridPanePlayers.getScene().getWindow().getWidth(),
                 gridPanePlayers.getScene().getWindow().getHeight());
 
+
         int v = 0;
-        for (var handler : sessionData.getServerSocket().getPlayerHandlers().values()) {
+        for (var handler : players) {
 
             HBox boxPlayer = new HBox();
             boxPlayer.setSpacing(10);
@@ -108,6 +107,8 @@ public class ListPlayersController {
         window.heightProperty().addListener((observable, oldValue, newValue) -> {
             updateLayout(width, newValue.doubleValue());
         });
+
+
     }
 
     double width = 0;

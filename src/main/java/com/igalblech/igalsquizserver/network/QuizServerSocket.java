@@ -1,12 +1,8 @@
 package com.igalblech.igalsquizserver.network;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.igalblech.igalsquizserver.OnGetAnswer;
 import com.igalblech.igalsquizserver.Questions.Answer;
 import com.igalblech.igalsquizserver.Questions.QuestionBase;
 import com.igalblech.igalsquizserver.controllers.OnPlayerName;
@@ -48,12 +44,16 @@ public class QuizServerSocket {
         config.setMaxFramePayloadLength(1048576);
         config.setMaxHttpContentLength(1048576);
 
+        // Enable CORS for specific origins
+        //config.setOrigin("http://localhost:5205"); // Allow requests from your frontend
+
+        // Enable both WebSocket and polling transports
+        //config.setTransports(Transport.WEBSOCKET, Transport.POLLING);
+        //config.setContext("/socket.io/");
+
         server = new SocketIOServer(config);
 
-
-
         // Register events
-
         server.addConnectListener(this::onConnected);
         server.addDisconnectListener(this::onDisconnected);
 
@@ -62,9 +62,7 @@ public class QuizServerSocket {
             SocketMessage message;
             try {
                 message = objectMapper.treeToValue(data, SocketMessage.class);
-            }
-            catch (IllegalArgumentException | JsonProcessingException e)
-            {
+            } catch (IllegalArgumentException | JsonProcessingException e) {
                 e.printStackTrace();
                 return;
             }
@@ -74,12 +72,9 @@ public class QuizServerSocket {
             receiveSocketMessage(client, message);
         });
 
-        /*server.addEventListener("message", SocketMessage.class, this::onMessage);
-
         server.addEventListener("connect_error", String.class, this::onError);
         server.addEventListener("connect_failed", String.class, this::onError);
         server.addEventListener("disconnect", String.class, this::onError);
-         */
     }
 
     public void removedUnnamed()
@@ -96,6 +91,7 @@ public class QuizServerSocket {
     }
 
     private void onError(SocketIOClient client, String string, AckRequest ackRequest) {
+        System.out.println("Error: " + string);
     }
 
     public void start() {
@@ -184,7 +180,10 @@ public class QuizServerSocket {
                 //if (onPlayerName != null)
                 //    Platform.runLater(() -> onPlayerName.nameRemoved(player));
                 PlayerHandler playerHandler = playerHandlers.get(socketMessage.getId());
-                playerHandlers.get(socketMessage.getId()).setActive(false);
+                if (playerHandler != null)
+                    playerHandlers.get(socketMessage.getId()).setActive(false);
+                else
+                    playerHandlers.remove(socketMessage.getId());
                 break;
             }
             case "connect":
@@ -201,10 +200,13 @@ public class QuizServerSocket {
         }
     }
 
-    public void sendQuestionData() {
+    public void sendQuestionData(int transitionTime) {
         SocketMessage socketMessage = new SocketMessage();
         socketMessage.setType("send_question");
-        System.out.println(socketMessage.getJsonData());
+
+        JSONObject object = new JSONObject();
+        object.put("transitionTime", transitionTime);
+        socketMessage.setJsonData(object.toString());
 
         sendMessageToAll(socketMessage);
     }
@@ -242,9 +244,23 @@ public class QuizServerSocket {
                 object.put("level", i++);
                 socketMessage.setJsonData(object.toString());
                 sendMessageToClient(handler, socketMessage);
-                handler.setAnswer(null);
+
+                System.out.println("QuizServerSocket.sendEndGame handler.setAnswer(null)");
+                // handler.setAnswer(null);
             }
         }
+    }
+
+    public void sendPunishment(PlayerHandler handler, String random) {
+        SocketMessage socketMessage = new SocketMessage();
+        socketMessage.setType("punishment");
+        sendMessageToClient(handler, socketMessage);
+    }
+
+    public void sendAward(PlayerHandler handler, String random) {
+        SocketMessage socketMessage = new SocketMessage();
+        socketMessage.setType("award");
+        sendMessageToClient(handler, socketMessage);
     }
 
     public void sendQuestionEnd(QuestionBase current) {
@@ -280,7 +296,6 @@ public class QuizServerSocket {
             socketMessage.setJsonData(node.toString());
 
             sendMessageToClient(handler, socketMessage);
-            handler.setAnswer(null);
         }
     }
 
@@ -331,14 +346,6 @@ public class QuizServerSocket {
 
     public void removePlayer(PlayerHandler handler) {
         playerHandlers.remove(handler.getUuid());
-    }
-
-    public void sendPunishment(PlayerHandler handler, String random) {
-
-    }
-
-    public void sendAward(PlayerHandler handler, String random) {
-
     }
 
 }

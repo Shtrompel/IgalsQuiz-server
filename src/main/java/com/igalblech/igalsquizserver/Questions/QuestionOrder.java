@@ -39,9 +39,6 @@ public class QuestionOrder extends QuestionBase implements Cloneable {
 
     @Override
     public void loadJsonSub(JSONObject object) throws JSONException {
-
-        System.out.println(object.toString());
-
         if (!object.has("order_answers"))
         {
             return;

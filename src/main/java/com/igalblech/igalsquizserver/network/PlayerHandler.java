@@ -20,8 +20,8 @@ public class PlayerHandler
     String name;
     @Getter
     int points;
-    @Getter @Setter
-    Answer answer;
+
+    private Answer answer;
     @Setter
     boolean active = true;
 
@@ -52,5 +52,13 @@ public class PlayerHandler
 
     public boolean isActive() {
         return active;
+    }
+
+    public Answer getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(Answer answer) {
+        this.answer = answer;
     }
 }

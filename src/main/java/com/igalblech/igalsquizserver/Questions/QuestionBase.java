@@ -1,6 +1,5 @@
 package com.igalblech.igalsquizserver.Questions;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.igalblech.igalsquizserver.QuizApplication;
 import javafx.scene.image.Image;
 import lombok.Getter;
@@ -24,6 +23,8 @@ public abstract class QuestionBase implements QuestionAbstract
     protected boolean randomize;
     protected int points;
     protected int timeLimit;
+    protected int transitionTime = -1;
+    protected boolean isRtl = false;
 
     Image image;
     javafx.scene.media.Media sound;
@@ -46,24 +47,10 @@ public abstract class QuestionBase implements QuestionAbstract
         out.put("points", points);
         out.put("timeLimit", timeLimit);
 
+        out.put("transitionTime", transitionTime);
+        out.put("isRtl", isRtl);
+
         toJsonSub(out);
-
-        return out;
-    }
-
-    public JSONObject toJsonQuestionOnly()
-    {
-        JSONObject out = new JSONObject();
-
-        out.put("questionType", questionType);
-        out.put("title", title);
-        out.put("description", description);
-
-        out.put("randomize", randomize);
-        out.put("points", points);
-        out.put("timeLimit", timeLimit);
-
-        toJsonQuestionOnlySub(out);
 
         return out;
     }
@@ -89,11 +76,18 @@ public abstract class QuestionBase implements QuestionAbstract
             imageStr = json.getString("image");
         if (json.has("sound"))
             soundStr = json.getString("sound");
+        if (json.has("transition_time")) {
+            transitionTime = json.getInt("transition_time");
+        }
+        if (json.has("is_rtl"))
+        {
+            isRtl = json.getBoolean("is_rtl");
+        }
 
         if (imageStr != null && !imageStr.isEmpty())
         {
             try {
-                URL resource = QuizApplication.class.getResource(imageStr);
+                URL resource = QuizApplication.getFileURL(imageStr);
                 assert resource != null;
                 this.image = new Image(resource.openStream());
             } catch (IllegalArgumentException | IOException | NullPointerException e) {
@@ -102,7 +96,7 @@ public abstract class QuestionBase implements QuestionAbstract
         }
 
         if (soundStr != null && !soundStr.isEmpty()) {
-            final URL resource = QuizApplication.class.getResource(soundStr);
+            final URL resource = QuizApplication.getFileURL(soundStr);
             if (resource != null)
                 this.sound = new javafx.scene.media.Media(resource.toString());
             else

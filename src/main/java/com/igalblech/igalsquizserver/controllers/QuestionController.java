@@ -1,12 +1,8 @@
 package com.igalblech.igalsquizserver.controllers;
 
-import com.igalblech.igalsquizserver.InterfaceController;
-import com.igalblech.igalsquizserver.Questions.Choice;
-import com.igalblech.igalsquizserver.Questions.QuestionBase;
-import com.igalblech.igalsquizserver.Questions.QuestionChoice;
-import com.igalblech.igalsquizserver.Questions.QuestionOrder;
+import com.igalblech.igalsquizserver.Questions.*;
 import com.igalblech.igalsquizserver.SharedSessionData;
-import com.igalblech.igalsquizserver.Utils;
+import com.igalblech.igalsquizserver.utils.Utils;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -62,7 +58,7 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
     void startQuestionTimer()
     {
-        System.out.println("QuestionController postIntroInit()");
+        System.out.println("QuestionController startQuestionTimer()");
 
         this.choicesAnimation = null;
 
@@ -73,7 +69,6 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
         sendQuestionStart();
 
         textQuestionTime.setVisible(true);
-        buttonFinishQuestion.setVisible(true);
 
         // If no time limit has made:
 
@@ -91,8 +86,9 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
                 long elapsedMillis = System.currentTimeMillis() - questionTimeStart;
                 long timePassed = questionTimeLimit - elapsedMillis;
 
-                if (timePassed < 0) {
+                if (timePassed < 0 && timerQuestion != null) {
                     timerQuestion.stop();
+                    timerQuestion = null;
                     onSendQuestionEnd();
                 }
 
@@ -114,7 +110,23 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
     {
         System.out.println("QuestionController applyQuestion(QuestionBase questionsBase)");
 
-        imageQuestionImage.setImage(questionsBase.getImage());
+        if (questionsBase.getImage() != null) {
+            imageQuestionImage.setFitWidth(
+                    Math.min(
+                            300,
+                    questionsBase.getImage().getWidth()));
+            imageQuestionImage.setFitHeight(Math.min(
+                    300,
+                    questionsBase.getImage().getHeight()));
+            imageQuestionImage.setPreserveRatio(true);
+            imageQuestionImage.setImage(questionsBase.getImage());
+            imageQuestionImage.setVisible(true);
+        }
+        else
+        {
+            imageQuestionImage.setVisible(false);
+        }
+
         textQuestionTitle.setText(questionsBase.getTitle());
         textQuestionDescription.setText(questionsBase.getDescription());
 
@@ -122,8 +134,9 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
 
         if ((questionsBase instanceof QuestionOrder question)) {
-            List<Choice> choiceList = question.getAnswersOut();
-            System.out.println("QuestionOrder: " + question.isRandomize());
+            List<Choice> choiceList = new ArrayList<>(question.getAnswersOut());
+            if (question.isRandomize())
+                Collections.shuffle(choiceList);
 
             double chroma = 0.3;
             for (int i = 0; i < choiceList.size(); i++) {
@@ -172,6 +185,10 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
             fillChoicesGrid(choiceList);
         }
+        else if ((questionsBase instanceof QuestionMatchPairs question))
+        {
+            clearGrid();
+        }
         else{
             System.out.println(
                     "Wrong type of question in QuestionController.");
@@ -180,15 +197,17 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
 
     private void sendQuestionData() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
-        data.getServerSocket().sendQuestionData();
+        data.getServerSocket().sendQuestionData(99999);
     }
 
     private void sendQuestionStart() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
+        QuestionBase base = data.getCurrent();
         data.getServerSocket().sendQuestionStart(data.getCurrent());
     }
 
-    void fillChoicesGrid(List<Choice> choiceList) {
+    void clearGrid()
+    {
         var gridPane = gridChoices;
 
         gridPane.setGridLinesVisible(false);
@@ -196,11 +215,40 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
         gridPane.getRowConstraints().clear();
         gridPane.getChildren().clear();
         gridPane.setGridLinesVisible(true);
+    }
+
+    void fillChoicesGrid(List<Choice> choiceList) {
+        clearGrid();
+
+        var gridPane = gridChoices;
 
         int[] grid = Utils.findClosestProduct(choiceList.size());
 
+        var scene = manager.getCurrentScene().getParent().getScene();
+
+        // Bind GridPane size to the scene or parent
+        gridPane.prefWidthProperty().bind(scene.widthProperty());
+        gridPane.prefHeightProperty().bind(scene.heightProperty());
+
+        // Clear existing constraints
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
+
+        // Set equal width and height for each cell
+        for (int col = 0; col < grid[1]; col++) {
+            ColumnConstraints colConstraints = new ColumnConstraints();
+            colConstraints.setPercentWidth(100.0 / grid[1]); // Equal width
+            gridPane.getColumnConstraints().add(colConstraints);
+        }
+
+        for (int row = 0; row < grid[0]; row++) {
+            RowConstraints rowConstraints = new RowConstraints();
+            rowConstraints.setPercentHeight(100.0 / grid[0]); // Equal height
+            gridPane.getRowConstraints().add(rowConstraints);
+        }
+
         int numColumns = grid[1];
-        //int numRows = grid[0];
+        int numRows = grid[0];
 
         // Add ChoiceNodes to the GridPane
         for (int i = 0; i < choiceList.size(); i++) {
@@ -227,41 +275,78 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
             // Add the ChoiceNode to the GridPane
             gridPane.add(choiceNode, column, row);
         }
+
     }
 
-    private SequentialTransition animateAllChoices(GridPane gridPane) {
+    Queue<ChoiceNode> animationNodesQueue;
+    List<MediaPlayer> medias = new ArrayList<>();
+
+    private void animateAllChoices(GridPane gridPane) {
+        boolean any = false;
         SequentialTransition allAnimations = new SequentialTransition();
 
-        boolean any = false;
+        animationNodesQueue = new LinkedList<>();
 
         // Iterate over the GridPane's children
         for (Node node : gridPane.getChildren()) {
             if (node instanceof ChoiceNode choiceNode) {
-
                 if (choiceNode.getMedia() == null)
                     continue;
-
                 any = true;
-
-                // Animate each ChoiceNode
-                SequentialTransition choiceAnimation = animateChoiceNode(choiceNode);
-                allAnimations.getChildren().add(choiceAnimation);
+                animationNodesQueue.add(choiceNode);
             }
         }
 
+        initializeNextAnimationNode(allAnimations);
+
         if (!any)
-            return null;
+        {
+            startQuestionTimer();
+        }
+    }
+
+    private void initializeNextAnimationNode(SequentialTransition allAnimations)
+    {
+        if (animationNodesQueue.isEmpty())
+        {
+            initializeAnimationNodeEnd(allAnimations);
+        }
+        else
+        {
+            ChoiceNode choiceNode = animationNodesQueue.poll();
+            final MediaPlayer mediaPlayer;
+            if (choiceNode.getMedia() != null) {
+                mediaPlayer = new MediaPlayer(choiceNode.getMedia());
+            } else {
+                mediaPlayer = null;
+            }
+
+            mediaPlayer.setOnReady(() -> {
+                SequentialTransition choiceAnimation = animateChoiceNode(choiceNode, mediaPlayer);
+                medias.add(mediaPlayer);
+                allAnimations.getChildren().add(choiceAnimation);
+
+                initializeNextAnimationNode(allAnimations);
+            });
+        }
+    }
+
+    private void initializeAnimationNodeEnd(SequentialTransition allAnimations)
+    {
+        this.choicesAnimation = allAnimations;
 
         // Add a listener for when all animations are finished
         allAnimations.setOnFinished(e -> {
             this.choicesAnimation = null;
+            ((SharedSessionData)manager.getUserData()).playMusicQuestion();
             startQuestionTimer();
         });
 
-        return allAnimations;
+        choicesAnimation.play();
     }
+    
 
-    private static SequentialTransition animateChoiceNode(ChoiceNode choiceNode) {
+    private SequentialTransition animateChoiceNode(ChoiceNode choiceNode, MediaPlayer mediaPlayer) {
         // Scale animation to grow and shrink the ChoiceNode
 
         PauseTransition onTop = new PauseTransition(Duration.millis(0));
@@ -275,24 +360,17 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
         scaleDown.setToX(1.0);
         scaleDown.setToY(1.0);
 
-        // MediaPlayer for sound
-        final MediaPlayer mediaPlayer;
-        if (choiceNode.getMedia() != null) {
-            mediaPlayer = new MediaPlayer(choiceNode.getMedia());
-        } else {
-            mediaPlayer = null;
-        }
-
         PauseTransition playSound = new PauseTransition(Duration.millis(0));
         playSound.setOnFinished(e -> {
             choiceNode.highlight(Color.YELLOW);
             if (mediaPlayer != null) {
+                ((SharedSessionData) manager.getUserData()).stopMusic();
                 mediaPlayer.play();
             }
         });
 
         // Play sound and highlight
-        PauseTransition pause = new PauseTransition(Duration.millis(500));
+        PauseTransition pause = new PauseTransition(mediaPlayer.getTotalDuration());
 
         // Reset highlight
         PauseTransition resetPause = new PauseTransition(Duration.millis(500));
@@ -309,20 +387,12 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
     {
         System.out.println("QuestionController onShown()");
 
-        sendQuestionData();
+        ((SharedSessionData)this.manager.getUserData()).playMusicQuestion();
 
         textQuestionTime.setVisible(false);
-        buttonFinishQuestion.setVisible(false);
 
         // On Scene Opened Stuff
-        choicesAnimation = animateAllChoices(gridChoices);
-        if (choicesAnimation != null) {
-            choicesAnimation.play();
-        }
-        else
-        {
-            startQuestionTimer();
-        }
+        animateAllChoices(gridChoices);
     }
 
     @Override
@@ -343,6 +413,10 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
             choicesAnimation.stop();
         }
         choicesAnimation = null;
+
+        for (var x : medias)
+            x.stop();
+        System.out.println("QuestionController.onClose()");
     }
 
     @Override
@@ -361,6 +435,8 @@ public class QuestionController implements InterfaceController, InterfaceQuestio
     public void onSendQuestionEnd() {
         SharedSessionData data = (SharedSessionData)manager.getUserData();
         data.sendQuestionEnd();
+
+        System.out.println("QuestionController.onSendQuestionEnd()");
 
         manager.changeScene("QUESTION_TRANSITION");
     }

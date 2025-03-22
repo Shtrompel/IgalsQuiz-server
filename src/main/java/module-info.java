@@ -22,5 +22,7 @@ module com.igalblech.igalsquizserver {
     exports com.igalblech.igalsquizserver.network;
     opens com.igalblech.igalsquizserver.controllers to com.fasterxml.jackson.databind, javafx.fxml;
     opens com.igalblech.igalsquizserver.network to com.fasterxml.jackson.databind, javafx.fxml;
+    exports com.igalblech.igalsquizserver.utils;
+    opens com.igalblech.igalsquizserver.utils to com.fasterxml.jackson.databind, javafx.fxml;
 
 }
